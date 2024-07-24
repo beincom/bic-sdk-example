@@ -1,0 +1,31 @@
+{
+  "name": "bic-sdk-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 8088",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@beincom/aa-sdk": "file:../bic-chain-sdk/packages/aa",
+    "@beincom/signers": "file:../bic-chain-sdk/packages/signers",
+    "axios": "^1.7.2",
+    "next": "14.2.5",
+    "notistack": "^3.0.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "usehooks-ts": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
