@@ -16,6 +16,8 @@ const SwapTokenUniswap = () => {
   const [selectedToken1, setSelectedToken1] = useState("");
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
 
+  const [slippage] = useState(0.5);
+
   const [session] = useLocalStorage("session", {});
 
   const handleInput1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +55,12 @@ const SwapTokenUniswap = () => {
         <LoginForm />
       </div>
       <h1 className="text-2xl font-bold mb-4">Swap Token Uniswap</h1>
+      <div>
+        <p className="mb-4">Default Slippage: {slippage}%</p>
+        <p className="mb-4">Price impact: 0.99%</p>
+        <p className="mb-4">Minimum amount: 12.000</p>
+        <p className="mb-4">Network cost: 23 BIC</p>
+      </div>
 
       <div className="mb-4">
         <label

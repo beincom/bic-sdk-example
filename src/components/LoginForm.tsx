@@ -81,9 +81,7 @@ const LoginForm: React.FC = () => {
           />
         </div>
         <div className="mb-6">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
+          <label className="block text-gray-700 text-sm font-bold mb-2">
             Recover Key
           </label>
           <input
@@ -102,9 +100,7 @@ const LoginForm: React.FC = () => {
           >
             {loginLoading ? "Loading..." : "Login"}
           </button>
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
+          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Recover
           </button>
           <button
