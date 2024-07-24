@@ -6,3 +6,7 @@ export type AuthSession = {
     id_token_expired_at: number;
     username: string;
 };
+
+export type UserProfile = {
+  id: string;
+};

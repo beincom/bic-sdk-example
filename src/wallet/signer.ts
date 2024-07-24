@@ -9,7 +9,6 @@ import * as auth from "./auth";
 import { BicSmartAccount } from "@/types";
 
 
-const AxiosSingleton = axios.create();
 
 const chain = deriveChain(ArbitrumSepolia, {
     rpcUrl: 'https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665',
@@ -17,7 +16,7 @@ const chain = deriveChain(ArbitrumSepolia, {
 
 const endPointUrl = process.env.NEXT_PUBLIC_BIC_WALLET_ENDPOINT as string;
 
-const signer = createBicSigner({
+export const signer = createBicSigner({
     url: endPointUrl,
     maxRetries: 2,
     refreshSession: async () => {
@@ -28,7 +27,6 @@ const signer = createBicSigner({
         return session.id_token
     },
 })
-
 let smartAccount: BicSmartAccount;
 export async function getSmartAccount() {
     if (smartAccount) return smartAccount
@@ -40,7 +38,7 @@ export async function getSmartAccount() {
     smartAccount = await createBicSmartAccount(token, {
         client: createBicSmartAccountClient({
             endpoint: endPointUrl,
-            httpClient: AxiosSingleton,
+            httpClient: auth.AxiosSingleton(),
         }),
         signer,
         chain,
