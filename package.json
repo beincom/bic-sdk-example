@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@beincom/aa-sdk": "file:../bic-chain-sdk/packages/aa",
+    "@beincom/dex": "file:../bic-chain-sdk/packages/dex",
     "@beincom/signers": "file:../bic-chain-sdk/packages/signers",
     "axios": "^1.7.2",
     "next": "14.2.5",
