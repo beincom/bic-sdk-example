@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { UniswapHelper, IPoolHelper, PoolHelper } from "@beincom/dex";
+import {  IPoolHelper, PoolHelper } from "@beincom/dex";
 
 import { BicSmartAccount, WalletInfo } from "@/types";
 import { getSmartAccount } from "@/wallet";
@@ -12,6 +12,7 @@ import LoginForm from "@/components/LoginForm";
 import { BIC_ADDRESS, FUSDT_ADDRESS } from "@/utils";
 import { SimulateResponse } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
+import { uniswapHelper, uniswapAdapter } from "./dex/uniswap";
 
 const SwapTokenUniswap = () => {
   const [input1Value, setInput0Value] = useState("");
@@ -45,8 +46,9 @@ const SwapTokenUniswap = () => {
     if (!selectedPool) {
       return;
     }
-    const exact = await selectedPool.swapExactAmountIn(
+    const exact = await uniswapAdapter.swapSingleExactAmountIn(
       {
+        pools: [selectedPool.pool],
         amount: event.target.value,
         token: selectedPool.token0(),
       },
@@ -74,8 +76,9 @@ const SwapTokenUniswap = () => {
     if (!selectedPool) {
       return;
     }
-    const exact = await selectedPool.swapExactAmountOut(
+    const exact = await uniswapAdapter.swapSingleExactAmountOut(
       {
+        pools: [selectedPool.pool],
         amount: event.target.value,
         token: selectedPool.token1(),
       },
@@ -149,17 +152,11 @@ const SwapTokenUniswap = () => {
   }, [session]);
 
   const fetchPool = async () => {
-    const uniswap = new UniswapHelper({
-      factoryAddress: process.env.NEXT_PUBLIC_UNISWAP_FACTORY_ADDRESS as string,
-      providerUrl:
-        "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
-    });
-
-    const poolAddress = await uniswap.computePoolAddress(
+    const poolAddress = await uniswapHelper.computePoolAddress(
       selectedToken0,
       selectedToken1
     );
-    const pool = await uniswap.constructPool(poolAddress, true);
+    const pool = await uniswapHelper.constructPool(poolAddress, true);
     const poolHelper = new PoolHelper(pool);
 
     setSelectedPoolAddress(poolAddress);
