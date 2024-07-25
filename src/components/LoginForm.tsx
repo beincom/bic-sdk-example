@@ -1,5 +1,5 @@
 import { useCustomSnackBar } from "@/hooks";
-import { AuthSession, UserProfile } from "@/types";
+import { AuthSession, UserProfile, WalletInfo } from "@/types";
 import { getSmartAccount, signer } from "@/wallet";
 import { getProfile, login } from "@/wallet/auth";
 import React, { useState } from "react";
@@ -16,8 +16,8 @@ const LoginForm: React.FC = () => {
     "session",
     null
   );
-  const [profile, setProfile] = useLocalStorage<UserProfile | null>(
-    "profile",
+  const [walletInfo, setWalletInfo] = useLocalStorage<WalletInfo | null>(
+    "wallet-info",
     null
   );
 
@@ -47,18 +47,21 @@ const LoginForm: React.FC = () => {
     setLoginLoading(true);
     try {
       const data = await login({ email, password, devices: [] });
-      const profile = await getProfile(data.username, {
-        accessToken: data.id_token,
-      });
-
-      // await getSmartAccount();
-
-      setProfile(profile);
       setSession(data);
+
+      const smartAccount = await getSmartAccount();
+      signer.startSession(data.id_token);
+      const wallet = await smartAccount.client.getWallet({
+        headers: {
+          Authorization: data.id_token,
+        },
+      });
+      setWalletInfo(wallet as any);
+
       setIsLogin(true);
       handleNotification("Login success", "success");
     } catch (error: any) {
-      console.error("Error logging in", error.response.data);
+      console.error("Error logging in", error);
       setIsLogin(false);
       handleNotification(error?.response?.data?.data?.message, "error");
     }
@@ -67,7 +70,7 @@ const LoginForm: React.FC = () => {
 
   const handleLoginWallet = async () => {
     // Handle form submission logic here
-    if (!session || !profile) {
+    if (!session || !walletInfo) {
       handleNotification("Please login first", "error");
       return;
     }
@@ -76,8 +79,9 @@ const LoginForm: React.FC = () => {
       const smartAccount = await getSmartAccount();
       const loginWallet = await smartAccount.signer.login({
         password: walletPassword,
-        userId: profile!.id,
+        userId: walletInfo.userId,
       });
+
       handleNotification("Login wallet success", "success");
     } catch (error: any) {
       console.log("🚀 ~ handleLoginWal ~ error:", error.message);
@@ -87,7 +91,7 @@ const LoginForm: React.FC = () => {
 
   const handleRecoverWallet = async () => {
     // Handle form submission logic here
-    if (!session || !profile) {
+    if (!session || !walletInfo) {
       handleNotification("Please login first", "error");
       return;
     }
@@ -95,7 +99,7 @@ const LoginForm: React.FC = () => {
       signer.startSession(session.id_token);
       await signer.setupForNewDevice({
         password: walletPassword,
-        userId: profile!.id,
+        userId: walletInfo.userId,
         recoveryCode: recoverKey,
       });
 

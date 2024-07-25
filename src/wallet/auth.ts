@@ -10,7 +10,8 @@ export const getSession = (): AuthSession => {
 }
 
 export const getToken = (): string => {
-    return JSON.parse(localStorage.getItem("session") as string).id_token;
+    const session = JSON.parse(localStorage.getItem("session") || "{}");
+    return session?.id_token;
 }
 
 export const login = async (payload: { email: string, password: string, devices: any }) => {

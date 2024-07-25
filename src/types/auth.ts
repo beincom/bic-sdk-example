@@ -10,3 +10,10 @@ export type AuthSession = {
 export type UserProfile = {
   id: string;
 };
+
+export type WalletInfo = {
+  userId: string,
+  address: string,
+  localAddress: string,
+  smartAccountAddress: string,
+};
