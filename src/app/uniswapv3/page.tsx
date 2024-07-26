@@ -9,16 +9,16 @@ import { BicSmartAccount, WalletInfo } from "@/types";
 import { getSmartAccount } from "@/wallet";
 
 import LoginForm from "@/components/LoginForm";
-import { BIC_ADDRESS, FUSDT_ADDRESS } from "@/utils";
-import { SimulateResponse } from "@beincom/aa-sdk";
+import { BIC_ADDRESS, ETH_NATIVE_ADDRESS, FUSDT_ADDRESS, ETH_WRAPPED_ADDRESS } from "@/utils";
+import { SimulateResponse,  } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
 import { uniswapHelper, uniswapAdapter } from "./dex/uniswap";
 
 const SwapTokenUniswap = () => {
   const [input1Value, setInput0Value] = useState("");
   const [input2Value, setInput1Value] = useState("");
-  const [selectedToken0, setSelectedToken0] = useState(FUSDT_ADDRESS);
-  const [selectedToken1, setSelectedToken1] = useState(BIC_ADDRESS);
+  const [selectedToken0, setSelectedToken0] = useState(BIC_ADDRESS);
+  const [selectedToken1, setSelectedToken1] = useState(FUSDT_ADDRESS);
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
   const [selectedPool, setSelectedPool] = useState<IPoolHelper>();
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string>();
@@ -46,16 +46,22 @@ const SwapTokenUniswap = () => {
     if (!selectedPool) {
       return;
     }
+
+    const tokenIn = String(selectedPool.token0().address).toLowerCase() === selectedToken0.toLowerCase() ? selectedPool.token0() : selectedPool.token1();
+
     const exact = await uniswapAdapter.swapSingleExactAmountIn(
       {
         pools: [selectedPool.pool],
         amount: event.target.value,
-        token: selectedPool.token0(),
+        token: tokenIn,
       },
       {
         deadline: Math.floor(Date.now() / 1000) + 60 * 20,
         recipient: walletInfo?.smartAccountAddress || "",
         slippage,
+      },
+      {
+        needDepositWETH: true,
       }
     );
 
@@ -76,16 +82,21 @@ const SwapTokenUniswap = () => {
     if (!selectedPool) {
       return;
     }
+
+    const tokenOut = String(selectedPool.token1().address).toLowerCase() === selectedToken1.toLowerCase() ? selectedPool.token1() : selectedPool.token0();
     const exact = await uniswapAdapter.swapSingleExactAmountOut(
       {
         pools: [selectedPool.pool],
         amount: event.target.value,
-        token: selectedPool.token1(),
+        token: tokenOut,
       },
       {
         deadline: Math.floor(Date.now() / 1000) + 60 * 20,
         recipient: walletInfo?.smartAccountAddress || "",
         slippage,
+      },
+      {
+        needWithdrawWETH: true,
       }
     );
 
@@ -119,9 +130,10 @@ const SwapTokenUniswap = () => {
         { calldata: calldata },
         true
       )) as SimulateResponse["changes"];
-      console.log("🚀 ~ SwapTokenUniswap ~ res:", res);
+      console.log("🚀 ~ fetchTransactionFee ~ res:", res)
       setNetworkFeeByBic(res[0].amount);
     } catch (error) {
+      handleNotification(`fetchTransactionFee error: ${error}`, "error");
       console.log("🚀 ~ fetchTransactionFee ~ error:", error);
     }
   };
@@ -132,15 +144,22 @@ const SwapTokenUniswap = () => {
         handleNotification(`calldata empty`, "success");
         return;
       }
+      setSwapLoading(true);
       const res = await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
         false
       );
-      console.log("🚀 ~ handleSwap ~ res:", res);
+      console.log("🚀 ~ handleSwap ~ res:", res)
+
       handleNotification(`Swap success: ${res}`, "success");
       setCalldata("");
       setNetworkFeeByBic("0");
-    } catch (error) {}
+      fetchPool();
+      setSwapLoading(false);
+    } catch (error) {
+      handleNotification(`Swap error: ${error}`, "error");
+      setSwapLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -152,6 +171,9 @@ const SwapTokenUniswap = () => {
   }, [session]);
 
   const fetchPool = async () => {
+    console.log("🚀 ~ fetchPool ~ selectedToken0:", selectedToken0)
+    console.log("🚀 ~ fetchPool ~ selectedToken1:", selectedToken1)
+
     const poolAddress = await uniswapHelper.computePoolAddress(
       selectedToken0,
       selectedToken1
@@ -166,10 +188,6 @@ const SwapTokenUniswap = () => {
   useEffect(() => {
     fetchPool();
   }, [selectedToken0, selectedToken1]);
-
-  useEffect(() => {
-    fetchTransactionFee();
-  }, [calldata]);
 
   return (
     <div className="bg-gray-200 p-4">
@@ -207,6 +225,8 @@ const SwapTokenUniswap = () => {
             onChange={handleToken0Change}
             className="border border-gray-300 rounded-md px-2 py-1 mb-2"
           >
+            <option value={ETH_NATIVE_ADDRESS}>ETH</option>
+            <option value={ETH_WRAPPED_ADDRESS}>WETH</option>
             <option value={FUSDT_ADDRESS}>FUST</option>
             <option value={BIC_ADDRESS}>BIC</option>
           </select>
@@ -234,6 +254,8 @@ const SwapTokenUniswap = () => {
             onChange={handleToken1Change}
             className="border border-gray-300 rounded-md px-2 py-1 mb-2"
           >
+            <option value={ETH_NATIVE_ADDRESS}>ETH</option>
+            <option value={ETH_WRAPPED_ADDRESS}>WETH</option>
             <option value={FUSDT_ADDRESS}>FUST</option>
             <option value={BIC_ADDRESS}>BIC</option>
           </select>
@@ -253,6 +275,12 @@ const SwapTokenUniswap = () => {
         className="bg-blue-500 text-white px-4 py-2 rounded-md"
       >
         {swapLoading ? "Loading" : "Swap"}
+      </button>
+      <button
+        onClick={fetchTransactionFee}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Fetch network cost
       </button>
     </div>
   );
