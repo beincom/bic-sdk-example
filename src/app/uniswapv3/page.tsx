@@ -18,7 +18,7 @@ const SwapTokenUniswap = () => {
   const [input1Value, setInput0Value] = useState("");
   const [input2Value, setInput1Value] = useState("");
   const [selectedToken0, setSelectedToken0] = useState(BIC_ADDRESS);
-  const [selectedToken1, setSelectedToken1] = useState(FUSDT_ADDRESS);
+  const [selectedToken1, setSelectedToken1] = useState(ETH_WRAPPED_ADDRESS);
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
   const [selectedPool, setSelectedPool] = useState<IPoolHelper>();
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string>();
@@ -61,7 +61,8 @@ const SwapTokenUniswap = () => {
         slippage,
       },
       {
-        needDepositWETH: true,
+        needDepositWETH: true, // Check tokenIn is WETH or ETH
+        needWithdrawWETH: true,
       }
     );
 
@@ -96,6 +97,7 @@ const SwapTokenUniswap = () => {
         slippage,
       },
       {
+        needDepositWETH: true,
         needWithdrawWETH: true,
       }
     );
@@ -195,6 +197,9 @@ const SwapTokenUniswap = () => {
         <LoginForm />
       </div>
       <h1 className="text-2xl font-bold mb-4">Swap Token Uniswap</h1>
+      <h3 className="text-2xl font-bold mb-4">
+        My account address: {walletInfo?.smartAccountAddress}
+      </h3>
       <h3 className="text-2xl font-bold mb-4">
         Selected pool: {selectedPoolAddress}
       </h3>
