@@ -217,10 +217,9 @@ const SwapTokenUniswap = () => {
       ETH_NATIVE_ADDRESS,
       ETH_WRAPPED_ADDRESS,
     ]);
-    console.log("🚀 ~ fetchBalances ~ balances:", tokenBalances);
     setBalances({
-      ...ethBalance,
       ...tokenBalances,
+      ...ethBalance,
     });
   };
 
