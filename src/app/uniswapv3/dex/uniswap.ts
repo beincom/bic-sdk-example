@@ -5,6 +5,7 @@ export const uniswapHelper = new UniswapHelper({
   factoryAddress: UNISWAP_FACTORY_ADDRESS,
   ethNativeAddress: ETH_NATIVE_ADDRESS,
   ethWrappedAddress: ETH_WRAPPED_ADDRESS,
+  multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
   providerUrl:
     "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
 });
