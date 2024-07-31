@@ -28,8 +28,10 @@ const SwapTokenUniswap = () => {
   const [selectedPool, setSelectedPool] = useState<IPoolHelper>();
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string>();
   const [priceImpact, setPriceImpact] = useState<string>();
+  const [amountOut, setAmountOut] = useState<string>();
   const [minimumAmountOut, setMinimumAmountOut] = useState<string>();
   const [maximumAmountIn, setMaximumAmountIn] = useState<string>();
+  const [amountIn, setAmountIn] = useState<string>();
   const [networkFeeByBic, setNetworkFeeByBic] = useState<string>("0");
   const [balances, setBalances] = useState<{ [key: string]: string }>();
   const [calldata, setCalldata] = useState<string>();
@@ -75,9 +77,11 @@ const SwapTokenUniswap = () => {
         needWithdrawWETH: true,
       }
     );
+    console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact)
 
     setInput1Value(exact.amountOut);
     setPriceImpact(exact.priceImpact);
+    setAmountOut(exact.amountOut);
     setMinimumAmountOut(exact.amountOutMin);
     setCalldata(exact.calldata);
   };
@@ -115,10 +119,14 @@ const SwapTokenUniswap = () => {
         needWithdrawWETH: true,
       }
     );
+    console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact)
 
     setInput0Value(exact.amountInMax);
     setPriceImpact(exact.priceImpact);
+    setMinimumAmountOut(exact.amountOutMin);
+    setAmountOut(exact.amountOut);
     setMaximumAmountIn(exact.amountInMax);
+    setAmountIn(exact.amountIn);
     setCalldata(exact.calldata);
   };
 
@@ -248,7 +256,10 @@ const SwapTokenUniswap = () => {
           Mid price token1/token0: {selectedPool?.token1Price()}
         </p>
         <p className="mb-4">Price impact: {priceImpact}%</p>
+        <p className="mb-4">Amount out: {amountOut}</p>
         <p className="mb-4">Minimum amount out receive: {minimumAmountOut}</p>
+
+        <p className="mb-4">Amount in to pay: {amountIn}</p>
         <p className="mb-4">Maximum amount in to pay: {maximumAmountIn}</p>
         <p className="mb-4">Network cost: {networkFeeByBic} BIC</p>
       </div>
