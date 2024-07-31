@@ -75,6 +75,7 @@ const SwapTokenUniswap = () => {
       {
         needDepositWETH: true, // Check tokenIn is WETH or ETH
         needWithdrawWETH: true,
+        needUseQuote: false,
       }
     );
     console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact)
