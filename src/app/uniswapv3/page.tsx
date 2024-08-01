@@ -236,6 +236,18 @@ const SwapTokenUniswap = () => {
     fetchBalances();
   }, []);
 
+  const fetchAutoSlippage = async () => {
+    if (!smartAccount) {
+      handleNotification("Please login first", "error");
+      return;
+    }
+
+  //  const historical = await uniswapHelper.getHistoricalPrices(selectedPoolAddress as string);
+  //  console.log("🚀 ~ fetchAutoSlippage ~ historical:", historical)
+   
+  };
+
+
   return (
     <div className="bg-gray-200 p-4">
       <div className="w-full">
@@ -265,11 +277,24 @@ const SwapTokenUniswap = () => {
         <p className="mb-4">Network cost: {networkFeeByBic} BIC</p>
       </div>
       <div className="mb-4">
+      <button
+          onClick={fetchPool}
+          className="bg-purple-500 text-white mr-4 px-4 py-2 rounded-md"
+        >
+          Fetch Pool
+        </button>
         <button
           onClick={fetchBalances}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          className="bg-blue-500 text-white mr-4 px-4 py-2 rounded-md"
         >
           Fetch balances
+        </button>
+
+        <button
+          onClick={fetchAutoSlippage}
+          className="bg-pink-500 text-white px-4 py-2 rounded-md"
+        >
+          Fetch auto slippage
         </button>
       </div>
       <div className="mb-4">
