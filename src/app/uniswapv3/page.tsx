@@ -18,6 +18,7 @@ import {
 import { SimulateResponse } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
 import { uniswapHelper, uniswapAdapter } from "./dex/uniswap";
+import { ethers } from "ethers";
 
 const SwapTokenUniswap = () => {
   const [input1Value, setInput0Value] = useState("");
@@ -153,6 +154,7 @@ const SwapTokenUniswap = () => {
       if (!calldata) return;
       const res = (await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
+        true,
         true
       )) as SimulateResponse["changes"];
       console.log("🚀 ~ fetchTransactionFee ~ res:", res);
@@ -172,6 +174,7 @@ const SwapTokenUniswap = () => {
       setSwapLoading(true);
       const res = await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
+        true,
         false
       );
       console.log("🚀 ~ handleSwap ~ res:", res);
@@ -247,6 +250,19 @@ const SwapTokenUniswap = () => {
    
   };
 
+  const approveToken = async () => {
+    if (!smartAccount) {
+      handleNotification("Please login first", "error");
+      return;
+    }
+
+    // const approveData = await uniswapAdapter.approveToken("0xeDBd85A479A078Bd33d5b5B16C360c1C3B028edc", FUSDT_ADDRESS,  "0" );
+    const approveData = await uniswapAdapter.approveToken("0xeDBd85A479A078Bd33d5b5B16C360c1C3B028edc", FUSDT_ADDRESS,  String(ethers.MaxUint256) );
+    console.log("🚀 ~ approveToken ~ approveData:", approveData)
+    const tx = await smartAccount.buildAndSendUserOperation(approveData, false);
+    console.log("🚀 ~ approveToken ~ tx:", tx)
+  };
+
 
   return (
     <div className="bg-gray-200 p-4">
@@ -295,6 +311,12 @@ const SwapTokenUniswap = () => {
           className="bg-pink-500 text-white px-4 py-2 rounded-md"
         >
           Fetch auto slippage
+        </button>
+        <button
+          onClick={approveToken}
+          className="bg-pink-500 text-white px-4 py-2 rounded-md"
+        >
+          Auto Approve FUSDT
         </button>
       </div>
       <div className="mb-4">

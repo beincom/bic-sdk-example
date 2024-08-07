@@ -13,6 +13,7 @@
     "@beincom/dex": "file:../bic-chain-sdk/packages/dex",
     "@beincom/signers": "file:../bic-chain-sdk/packages/signers",
     "axios": "^1.7.2",
+    "ethers": "^6.13.2",
     "next": "14.2.5",
     "notistack": "^3.0.1",
     "react": "^18",
