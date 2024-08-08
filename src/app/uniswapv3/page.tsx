@@ -154,7 +154,7 @@ const SwapTokenUniswap = () => {
       if (!calldata) return;
       const res = (await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
-        true,
+        false,
         true
       )) as SimulateResponse["changes"];
       console.log("🚀 ~ fetchTransactionFee ~ res:", res);
@@ -174,7 +174,7 @@ const SwapTokenUniswap = () => {
       setSwapLoading(true);
       const res = await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
-        true,
+        false,
         false
       );
       console.log("🚀 ~ handleSwap ~ res:", res);
@@ -256,10 +256,10 @@ const SwapTokenUniswap = () => {
       return;
     }
 
-    // const approveData = await uniswapAdapter.approveToken("0xeDBd85A479A078Bd33d5b5B16C360c1C3B028edc", FUSDT_ADDRESS,  "0" );
-    const approveData = await uniswapAdapter.approveToken("0xeDBd85A479A078Bd33d5b5B16C360c1C3B028edc", FUSDT_ADDRESS,  String(ethers.MaxUint256) );
+    // const approveData = await uniswapAdapter.approveToken("0xf817a221d8a41d4d2f52289c2eb892ef64aa6194", FUSDT_ADDRESS,  "0" );
+    const approveData = await uniswapAdapter.approveToken("0xf817a221d8a41d4d2f52289c2eb892ef64aa6194", BIC_ADDRESS,  String(ethers.MaxUint256) );
     console.log("🚀 ~ approveToken ~ approveData:", approveData)
-    const tx = await smartAccount.buildAndSendUserOperation(approveData, false);
+    const tx = await smartAccount.buildAndSendUserOperation(approveData, false, false);
     console.log("🚀 ~ approveToken ~ tx:", tx)
   };
 
