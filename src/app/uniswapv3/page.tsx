@@ -28,6 +28,7 @@ const SwapTokenUniswap = () => {
   const [selectedPool, setSelectedPool] = useState<IPoolHelper>();
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string>();
   const [priceImpact, setPriceImpact] = useState<string>();
+  const [executionPrice, setExecutionPrice] = useState<string>();
   const [amountOut, setAmountOut] = useState<string>();
   const [minimumAmountOut, setMinimumAmountOut] = useState<string>();
   const [maximumAmountIn, setMaximumAmountIn] = useState<string>();
@@ -82,6 +83,7 @@ const SwapTokenUniswap = () => {
 
     setInput1Value(exact.amountOut);
     setPriceImpact(exact.priceImpact);
+    setExecutionPrice(exact.executionPrice);
     setAmountOut(exact.amountOut);
     setMinimumAmountOut(exact.amountOutMin);
     setCalldata(exact.calldata);
@@ -124,6 +126,7 @@ const SwapTokenUniswap = () => {
 
     setInput0Value(exact.amountInMax);
     setPriceImpact(exact.priceImpact);
+    setExecutionPrice(exact.executionPrice);
     setMinimumAmountOut(exact.amountOutMin);
     setAmountOut(exact.amountOut);
     setMaximumAmountIn(exact.amountInMax);
@@ -267,6 +270,9 @@ const SwapTokenUniswap = () => {
         </p>
         <p className="mb-4">
           Mid price token1/token0: {selectedPool?.token1Price()}
+        </p>
+        <p className="mb-4">
+          Execution price: {executionPrice}
         </p>
         <p className="mb-4">Price impact: {priceImpact}%</p>
         <p className="mb-4">Amount out: {amountOut}</p>
