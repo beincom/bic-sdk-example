@@ -17,7 +17,7 @@ import {
 } from "@/utils";
 import { SimulateResponse } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
-import { uniswapHelper, uniswapAdapter } from "./dex/uniswap";
+import { uniswapHelper, uniswapAdapter } from "./../../utils/uniswap";
 
 const SwapTokenUniswap = () => {
   const [input1Value, setInput0Value] = useState("");
@@ -205,6 +205,7 @@ const SwapTokenUniswap = () => {
     );
     const pool = await uniswapHelper.constructPool(poolAddress, true);
     const poolHelper = new PoolHelper(pool);
+    console.log("🚀 ~ fetchPool ~ pool:", poolHelper.token0Price(), poolHelper.token1Price())
 
     setSelectedPoolAddress(poolAddress);
     setSelectedPool(poolHelper);
