@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@beincom/aa-sdk": "file:../bic-chain-sdk/packages/aa",
-    "@beincom/dex": "file:../bic-chain-sdk/packages/dex",
-    "@beincom/marketplace": "file:../bic-chain-sdk/packages/marketplace",
-    "@beincom/payments": "file:../bic-chain-sdk/packages/payments",
+    "@beincom/aa-sdk": "^0.0.12-rc.3",
+    "@beincom/dex": "^0.0.1-rc.3",
+    "@beincom/marketplace": "^0.0.1-rc.0",
+    "@beincom/payments": "^0.0.1-rc.2",
     "@beincom/signers": "file:../bic-chain-sdk/packages/signers",
     "axios": "^1.7.2",
     "next": "14.2.5",

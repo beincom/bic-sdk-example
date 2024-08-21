@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 
-import { BicSmartAccount, WalletInfo } from "@/types";
+import { AuthSession, BicSmartAccount, WalletInfo } from "@/types";
 import { getSmartAccount } from "@/wallet";
 
 import LoginForm from "@/components/LoginForm";
@@ -21,7 +21,7 @@ const PaymentServicePage = () => {
 
   const [calldata, setCalldata] = useState<string>();
 
-  const [session] = useLocalStorage("session", {});
+  const [session] = useLocalStorage<AuthSession | null>("session", null);
   const [walletInfo] = useLocalStorage<WalletInfo | null>("wallet-info", null);
 
   const { handleNotification } = useCustomSnackBar();
@@ -78,6 +78,27 @@ const PaymentServicePage = () => {
     }
   };
 
+
+  const handleGetWalletByUserId = async () => {
+    try {
+      if(!session) {
+        return;
+      }
+      const res = await smartAccount?.client.getWalletByUserId("8122c6ba-ed17-4929-a76e-2b9671d34474", {
+        headers: {
+          Authorization: session.id_token || ""
+        }
+      });
+      console.log("🚀 ~ handleGetWalletByUserId ~ res:", res)
+
+
+    } catch (error) {
+      handleNotification(`fetchTransactionFee error: ${error}`, "error");
+
+    }
+  };
+
+
   useEffect(() => {
     if (session) {
       getSmartAccount().then((account) => {
@@ -112,6 +133,13 @@ const PaymentServicePage = () => {
         />
       </div>
       <div className="mb-4">
+      <button
+          onClick={handleGetWalletByUserId}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Get Wallet By UserId
+        </button>
+
         <button
           onClick={handleTip}
           className="bg-blue-500 text-white px-4 py-2 rounded-md"

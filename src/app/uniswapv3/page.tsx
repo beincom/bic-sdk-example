@@ -36,7 +36,7 @@ const SwapTokenUniswap = () => {
   const [networkFeeByBic, setNetworkFeeByBic] = useState<string>("0");
   const [balances, setBalances] = useState<{ [key: string]: string }>();
   const [calldata, setCalldata] = useState<string>();
-  const [slippage] = useState((5e2).toString());
+  const [slippage] = useState((5e2).toString()); // 0.5
   const [swapLoading, setSwapLoading] = useState(false);
 
   const [session] = useLocalStorage("session", {});

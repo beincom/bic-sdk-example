@@ -43,6 +43,12 @@ const MarketplacePage = () => {
     console.log("🚀 ~ handleGetAuctions ~ res:", res)
   };
 
+  const handleGetStatusCollected = async () => {
+    const res = await marketplace.getAuctionCollectedStatus(90);
+    console.log("🚀 ~ handleGetAuctions ~ res:", res)
+  };
+
+
   const handleCreateAuction = async () => {
     if(!smartAccount) { 
       handleNotification("Please login first", "error");
@@ -284,6 +290,12 @@ const MarketplacePage = () => {
           className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4"
         >
           Get total auction
+        </button>
+        <button
+          onClick={handleGetStatusCollected}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4"
+        >
+          Get Status auction
         </button>
       </div>
       <div className="mb-4">
