@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-
 import { AuthSession, BicSmartAccount, WalletInfo } from "@/types";
 import { getSmartAccount } from "@/wallet";
 
@@ -11,41 +10,50 @@ import LoginForm from "@/components/LoginForm";
 import { BIC_ADDRESS, ETH_WRAPPED_ADDRESS } from "@/utils";
 import { useCustomSnackBar } from "@/hooks";
 import { paymentService } from "@/utils/payments";
-import { SimulateResponse } from "@beincom/aa-sdk";
+import { SimulateResponse, UserData } from "@beincom/aa-sdk";
+import { bicSubgraph } from "@/utils/uniswap";
 
 const PaymentServicePage = () => {
   const [input0Value, setInput0Value] = useState("");
   const [networkFeeByBic, setNetworkFeeByBic] = useState<string>("0");
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
 
-
   const [calldata, setCalldata] = useState<string>();
 
   const [session] = useLocalStorage<AuthSession | null>("session", null);
   const [walletInfo] = useLocalStorage<WalletInfo | null>("wallet-info", null);
 
-  const { handleNotification } = useCustomSnackBar();
+  const [bicAddresses, setBicAddresses] = useState<string[]>([]);
+  const [bicUsers, setBicUsers] = useState<UserData[]>([]);
 
+  const { handleNotification } = useCustomSnackBar();
 
   const handleInput0Change = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput0Value(e.target.value);
     const amount = e.target.value;
     const message = {
-      msg:"This is a tip message",
-      postId: "1234"
-    }
+      senderId: "9f5b0d5d-1fed-4d82-8e33-3e769d66dfac",
+      useCase: "content.donation",
+      objectId: "83b23114-31b6-4c50-b81f-98c56c5daa24",
+      message: "This is a message",
+    };
     try {
-      const res = await paymentService.tipForCreator({
+      const res = await paymentService.transferERC20Message({
         amount: amount,
-        decimals: "18",
-        token: BIC_ADDRESS,
-        creator: "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
-        msg: JSON.stringify(message)
+
+        token: {
+          address: BIC_ADDRESS,
+          decimals: 18,
+          name: "",
+          symbol: "",
+        },
+        to: "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
+        msg: JSON.stringify(message),
       });
       setCalldata(res.calldata);
     } catch (error) {
-      console.log("🚀 ~ handleTip ~ error:", error.message)
-      handleNotification( "Error in tipForCreator", "error");      
+      console.log("🚀 ~ handleTip ~ error:", error.message);
+      handleNotification("Error in tipForCreator", "error");
     }
   };
 
@@ -70,34 +78,98 @@ const PaymentServicePage = () => {
         { calldata: calldata },
         false
       )) as SimulateResponse["changes"];
-      console.log("🚀 ~ handleTip ~ res:", res)
-
+      console.log("🚀 ~ handleTip ~ res:", res);
     } catch (error) {
       handleNotification(`fetchTransactionFee error: ${error}`, "error");
       console.log("🚀 ~ fetchTransactionFee ~ error:", error);
     }
   };
 
-
   const handleGetWalletByUserId = async () => {
     try {
-      if(!session) {
+      if (!session) {
+        handleNotification("Please login first", "error");
         return;
       }
-      const res = await smartAccount?.client.getWalletByUserId("8122c6ba-ed17-4929-a76e-2b9671d34474", {
-        headers: {
-          Authorization: session.id_token || ""
+      const res = await smartAccount?.client.getWalletByUserId(
+        "8122c6ba-ed17-4929-a76e-2b9671d34474",
+        {
+          headers: {
+            Authorization: session.id_token || "",
+          },
         }
-      });
-      console.log("🚀 ~ handleGetWalletByUserId ~ res:", res)
-
-
+      );
+      console.log("🚀 ~ handleGetWalletByUserId ~ res:", res);
     } catch (error) {
       handleNotification(`fetchTransactionFee error: ${error}`, "error");
-
     }
   };
 
+  const handleGetBicInfo = async () => {
+    try {
+      if (!session) {
+        handleNotification("Please login first", "error");
+        return;
+      }
+
+      const bicInfo = await bicSubgraph.getBicInformation({});
+      console.log("🚀 ~ handleGetBicInfo ~ bicInfo:", bicInfo);
+      setBicAddresses(bicInfo.addresses);
+    } catch (error) {
+      handleNotification(`fetchTransactionFee error: ${error}`, "error");
+    }
+  };
+
+  const handleGetUsersByAddresses = async () => {
+    try {
+      if (!session) {
+        handleNotification("Please login first", "error");
+        return;
+      }
+      if (!smartAccount) {
+        handleNotification("Please login first", "error");
+        return;
+      }
+
+      const bicInfo = await smartAccount.client.getUsersByAddresses(
+        [
+          "0xE8AFce87993Bd475FAf2AeA62e0B008Dc27Ab81A",
+          "0x99D672D63bB316B495B6700827D6153Bf8E540Fb",
+        ],
+        {
+          headers: {
+            Authorization: session.id_token || "",
+          },
+        }
+      );
+
+      setBicUsers(bicInfo);
+      console.log("🚀 ~ handleGetBicInfo ~ bicInfo:", bicInfo);
+    } catch (error) {
+      handleNotification(`fetchTransactionFee error: ${error}`, "error");
+    }
+  };
+
+  const handleGetHistory = async () => {
+    try {
+      if (!session) {
+        handleNotification("Please login first", "error");
+        return;
+      }
+
+      const bicInfo = await bicSubgraph.getHistoriesOfAddress({
+        address: "0x99D672D63bB316B495B6700827D6153Bf8E540Fb",
+        option: {
+          first: 100,
+          offset: 0,
+          orderDirection: "desc",
+        },
+      });
+      console.log("🚀 ~ handleGetBicInfo ~ bicInfo:", bicInfo);
+    } catch (error) {
+      handleNotification(`fetchTransactionFee error: ${error}`, "error");
+    }
+  };
 
   useEffect(() => {
     if (session) {
@@ -116,9 +188,7 @@ const PaymentServicePage = () => {
       <h3 className="text-2xl font-bold mb-4">
         My account address: {walletInfo?.smartAccountAddress}
       </h3>
-      <h3 className="text-2xl font-bold mb-4">
-        Token tip: {BIC_ADDRESS}
-      </h3>
+      <h3 className="text-2xl font-bold mb-4">Token tip: {BIC_ADDRESS}</h3>
       <h4 className="text-2xl font-bold mb-4">
         Network cost: {networkFeeByBic}
       </h4>
@@ -132,8 +202,9 @@ const PaymentServicePage = () => {
           placeholder="Enter amount0"
         />
       </div>
+
       <div className="mb-4">
-      <button
+        <button
           onClick={handleGetWalletByUserId}
           className="bg-blue-500 text-white px-4 py-2 rounded-md"
         >

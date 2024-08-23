@@ -6,6 +6,12 @@ import {
   UNISWAP_ROUTER_ADDRESS,
 } from "@/utils";
 import { UniswapAdapter, UniswapHelper } from "@beincom/dex";
+import {} from "@beincom/aa-sdk";
+import { createBicSubgraph } from "@beincom/aa-sdk/subgraph";
+import { createBicSmartAccountClient } from "@beincom/aa-sdk/client";
+import * as auth from "./../wallet/auth";
+
+const endPointUrl = process.env.NEXT_PUBLIC_BIC_WALLET_ENDPOINT as string;
 
 export const uniswapHelper = new UniswapHelper({
   factoryAddress: UNISWAP_FACTORY_ADDRESS,
@@ -24,6 +30,19 @@ export const uniswapAdapter = new UniswapAdapter({
   ethNativeAddress: ETH_NATIVE_ADDRESS,
   ethWrappedAddress: ETH_WRAPPED_ADDRESS,
   quoterV2Address: UNISWAP_QUOTEV2_ADDRESS,
+  providerUrl:
+    "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
+});
+
+export const bicSubgraph = createBicSubgraph({
+  uniswapSubgraphUrl:
+    "https://subgraph.satsuma-prod.com/1cd23d9e0043/bic-dev-team--504954/bic-uniswap-v3-subgraph/api",
+  bicSubgraphUrl:
+    "https://subgraph.satsuma-prod.com/1cd23d9e0043/bic-dev-team--504954/bic-subgraph/api",
+  client: createBicSmartAccountClient({
+    endpoint: endPointUrl,
+    httpClient: auth.AxiosSingleton(),
+  }),
   providerUrl:
     "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
 });

@@ -22,7 +22,7 @@ const MarketplacePage = () => {
 
   const { handleNotification } = useCustomSnackBar();
 
-  const auctionId = "91";
+  const auctionId = "92";
   const listingId = "2";
   const offerId = "2";
   useEffect(() => {
@@ -44,10 +44,9 @@ const MarketplacePage = () => {
   };
 
   const handleGetStatusCollected = async () => {
-    const res = await marketplace.getAuctionCollectedStatus(90);
+    const res = await marketplace.getAuctionCollectedStatus(Number(auctionId));
     console.log("🚀 ~ handleGetAuctions ~ res:", res)
   };
-
 
   const handleCreateAuction = async () => {
     if(!smartAccount) { 
