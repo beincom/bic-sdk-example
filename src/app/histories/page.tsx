@@ -57,6 +57,24 @@ const HistoriesPage = () => {
     }
   };
 
+  const handleGetHistoriesV2 = async () => {
+    try {
+      if (!smartAccount) {
+        handleNotification("Please login first", "error");
+        return;
+      }
+
+      const bicInfo = await smartAccount.client.getHistories({
+        limit: 100,
+        order: "desc",
+        page: 1
+      });
+
+    } catch (error) {
+      handleNotification(`fetchTransactionFee error: ${error}`, "error");
+    }
+  };
+
   const handleGetUsersByAddresses = async () => {
     try {
       if (!session) {
@@ -494,6 +512,8 @@ const HistoriesPage = () => {
     return historyItems;
   };
 
+  
+
   return (
     <div className="bg-gray-200 p-4">
       <div className="w-full">
@@ -520,6 +540,13 @@ const HistoriesPage = () => {
           className="bg-blue-500 text-white px-4 py-2 rounded-md"
         >
           Get Users by addresses
+        </button>
+
+        <button
+          onClick={handleGetHistoriesV2}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Get histories v2
         </button>
       </div>
       <div className="mb-4">

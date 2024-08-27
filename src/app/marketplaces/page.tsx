@@ -22,8 +22,8 @@ const MarketplacePage = () => {
 
   const { handleNotification } = useCustomSnackBar();
 
-  const auctionId = "92";
-  const listingId = "2";
+  const auctionId = "96";
+  const listingId = "3";
   const offerId = "2";
   useEffect(() => {
     if (session) {
