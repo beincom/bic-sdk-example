@@ -14,7 +14,6 @@ import {
   ERC20Transfer,
   ERC721Transfer,
   GetHistoriesOfAddressResponse,
-  HistoriesFromSubgraphResponse,
   LoseBid,
   MintHandle,
   NewBid,
@@ -63,13 +62,21 @@ const HistoriesPage = () => {
         handleNotification("Please login first", "error");
         return;
       }
+      if (!session) {
+        handleNotification("Please login first", "error");
+        return;
+      }
 
       const bicInfo = await smartAccount.client.getHistories({
-        limit: 100,
+        limit: "100",
         order: "desc",
-        page: 1
+        page: "1"
+      }, {
+        headers: {
+          Authorization: session.id_token || "",
+        },
       });
-
+      setHistories(bicInfo.list);
     } catch (error) {
       handleNotification(`fetchTransactionFee error: ${error}`, "error");
     }
