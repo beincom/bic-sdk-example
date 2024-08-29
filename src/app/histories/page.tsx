@@ -25,7 +25,7 @@ import {
 
 import { AuthSession, BicSmartAccount, WalletInfo } from "@/types";
 import { getSmartAccount } from "@/wallet";
-import { bicSubgraph } from "@/utils/uniswap";
+// import { bicSubgraph } from "@/utils/uniswap";
 
 import LoginForm from "@/components/LoginForm";
 import { useCustomSnackBar } from "@/hooks";
@@ -41,20 +41,6 @@ const HistoriesPage = () => {
   const [histories, setHistories] = useState<GetHistoriesOfAddressResponse>([]);
 
   const { handleNotification } = useCustomSnackBar();
-
-  const handleGetBicInfo = async () => {
-    try {
-      if (!session) {
-        handleNotification("Please login first", "error");
-        return;
-      }
-
-      const bicInfo = await bicSubgraph.getBicInformation({});
-      setBicAddresses(bicInfo.addresses);
-    } catch (error) {
-      handleNotification(`fetchTransactionFee error: ${error}`, "error");
-    }
-  };
 
   const handleGetHistoriesV2 = async () => {
     try {
@@ -82,50 +68,6 @@ const HistoriesPage = () => {
     }
   };
 
-  const handleGetUsersByAddresses = async () => {
-    try {
-      if (!session) {
-        handleNotification("Please login first", "error");
-        return;
-      }
-      if (!smartAccount) {
-        handleNotification("Please login first", "error");
-        return;
-      }
-      const addresses = handleFilterAddressesInHistories();
-      const bicInfo = await smartAccount.client.getUsersByAddresses(addresses, {
-        headers: {
-          Authorization: session.id_token || "",
-        },
-      });
-
-      setBicUsers(bicInfo);
-    } catch (error) {
-      handleNotification(`fetchTransactionFee error: ${error}`, "error");
-    }
-  };
-
-  const handleGetHistory = async () => {
-    try {
-      if (!session) {
-        handleNotification("Please login first", "error");
-        return;
-      }
-
-      const bicInfo = await bicSubgraph.getHistoriesOfAddress({
-        address: "0x99D672D63bB316B495B6700827D6153Bf8E540Fb",
-        option: {
-          first: 100,
-          offset: 0,
-          orderDirection: "desc",
-        },
-      });
-      setHistories(bicInfo);
-      console.log("🚀 ~ handleGetBicInfo ~ bicInfo:", bicInfo);
-    } catch (error) {
-      handleNotification(`fetchTransactionFee error: ${error}`, "error");
-    }
-  };
 
   useEffect(() => {
     if (session) {
@@ -135,48 +77,12 @@ const HistoriesPage = () => {
     }
   }, [session]);
 
-  const handleFilterAddressesInHistories = () => {
-    if (!histories) {
-      return [];
-    }
-    const addresses = histories
-      .map((history: any) => {
-        const keys = [
-          "from",
-          "to",
-          "sender",
-          "recipient",
-          "beneficiary",
-          "auctionCreator",
-          "listingCreator",
-          "bidder",
-          "winningBidder",
-          "buyer",
-        ];
-        const result = keys
-          .map((key) => {
-            return history[key];
-          })
-          .filter((address) => !!address);
-        return result;
-      })
-      .flat();
-
-    const unique = unionBy(addresses, (address) => address.toLowerCase());
-    return unique;
-  };
-
-  useEffect(() => {
-    if (session) {
-      handleGetUsersByAddresses();
-    }
-  }, [histories]);
-
   const renderSwap = (txType: string, history: Swap) => {
     const isFrom = Number(history.amount0) < 0;
     return (
       <div className="mb-4 border-s-orange-50">
         <p>{txType}</p>
+        <p>{history?.recipientUser?.username}</p>
         <p>{history.transaction.id}</p>
         <p>{history.transaction.timestamp}</p>
         {isFrom && (
@@ -211,9 +117,11 @@ const HistoriesPage = () => {
         <p>{history.transaction.id}</p>
         <p>{history.transaction.timestamp}</p>
         <p>
-          From: {history.from} To: {history.to}
+          From: {history.from} {history.fromUser?.username}
         </p>
-        <p>To: {history.to}</p>
+        <p>
+          To: {history.to} {history.toUser?.username}
+        </p>
         <p>
           Amount: {history.amount} {history.token.name}
         </p>
@@ -228,9 +136,11 @@ const HistoriesPage = () => {
         <p>{history.transaction.id}</p>
         <p>{history.transaction.timestamp}</p>
         <p>
-          From: {history.from} To: {history.to}
+          From: {history.from} {history.fromUser?.username}
         </p>
-        <p>To: {history.to}</p>
+        <p>
+          To: {history.to} {history.toUser?.username}
+        </p>
         <p>
           Token: {history.tokenId} {history.token.name}
         </p>
@@ -530,25 +440,6 @@ const HistoriesPage = () => {
         My account address: {walletInfo?.smartAccountAddress}
       </h3>
       <div className="mb-4">
-        <button
-          onClick={handleGetBicInfo}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Get Bic Info
-        </button>
-        <button
-          onClick={handleGetHistory}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Get Histories
-        </button>
-        <button
-          onClick={handleGetUsersByAddresses}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Get Users by addresses
-        </button>
-
         <button
           onClick={handleGetHistoriesV2}
           className="bg-blue-500 text-white px-4 py-2 rounded-md"

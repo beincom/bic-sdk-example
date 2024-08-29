@@ -7,7 +7,6 @@ import {
 } from "@/utils";
 import { UniswapAdapter, UniswapHelper } from "@beincom/dex";
 import {} from "@beincom/aa-sdk";
-import { createBicSubgraph } from "@beincom/aa-sdk/subgraph";
 import { createBicSmartAccountClient } from "@beincom/aa-sdk/client";
 import * as auth from "./../wallet/auth";
 
@@ -34,15 +33,15 @@ export const uniswapAdapter = new UniswapAdapter({
     "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
 });
 
-export const bicSubgraph = createBicSubgraph({
-  uniswapSubgraphUrl:
-    "https://subgraph.satsuma-prod.com/1cd23d9e0043/bic-dev-team--504954/bic-uniswap-v3-subgraph/api",
-  bicSubgraphUrl:
-    "https://subgraph.satsuma-prod.com/1cd23d9e0043/bic-dev-team--504954/bic-subgraph/api",
-  client: createBicSmartAccountClient({
-    endpoint: endPointUrl,
-    httpClient: auth.AxiosSingleton(),
-  }),
-  providerUrl:
-    "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
-});
+// export const bicSubgraph = createBicSubgraph({
+//   uniswapSubgraphUrl:
+//     "https://subgraph.satsuma-prod.com/1cd23d9e0043/bic-dev-team--504954/bic-uniswap-v3-subgraph/api",
+//   bicSubgraphUrl:
+//     "https://subgraph.satsuma-prod.com/1cd23d9e0043/bic-dev-team--504954/bic-subgraph/api",
+//   client: createBicSmartAccountClient({
+//     endpoint: endPointUrl,
+//     httpClient: auth.AxiosSingleton(),
+//   }),
+//   providerUrl:
+//     "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
+// });
