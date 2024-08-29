@@ -21,7 +21,7 @@ import {
   NewSale,
   ShareRevenue,
   Swap,
-} from "@beincom/aa-sdk/subgraph";
+} from "@beincom/aa-sdk/types";
 
 import { AuthSession, BicSmartAccount, WalletInfo } from "@/types";
 import { getSmartAccount } from "@/wallet";
@@ -284,7 +284,8 @@ const HistoriesPage = () => {
     const isBidder =
       history.winningBidder.toLowerCase() ===
       walletInfo?.smartAccountAddress.toLowerCase();
-    const { collectToken, collectPayout, bidPayout } = history;
+    const { auction,collectToken, collectPayout, bidPayout } = history;
+    console.log("🚀 ~ renderAuctionClosed ~ auction:", auction.auctionId)
     if (isCreator) {
       if (collectPayout) {
         return (

@@ -22,7 +22,7 @@ const MarketplacePage = () => {
 
   const { handleNotification } = useCustomSnackBar();
 
-  const auctionId = "96";
+  const auctionId = "97";
   const listingId = "5";
   const offerId = "2";
   useEffect(() => {
