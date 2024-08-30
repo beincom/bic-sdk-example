@@ -22,8 +22,8 @@ const MarketplacePage = () => {
 
   const { handleNotification } = useCustomSnackBar();
 
-  const auctionId = "97";
-  const listingId = "5";
+  const auctionId = "98";
+  const listingId = "8";
   const offerId = "2";
   useEffect(() => {
     if (session) {
@@ -54,7 +54,7 @@ const MarketplacePage = () => {
       return;
     }
     const res = await marketplace.createAuction(walletInfo!.smartAccountAddress, {
-      tokenId: "23876103999596038501684966597109561354210392938526387450156480010624699820667",
+      tokenId: "67450960916127539259896136306566687704909636524553778509056067106384516850372",
       currency: {
         address: BIC_ADDRESS,
         decimals: 18,
@@ -147,7 +147,7 @@ const MarketplacePage = () => {
       return;
     }
     const res = await marketplace.createListing(walletInfo!.smartAccountAddress, {
-      tokenId: "23876103999596038501684966597109561354210392938526387450156480010624699820667",
+      tokenId: "67450960916127539259896136306566687704909636524553778509056067106384516850372",
       currency: {
         address: BIC_ADDRESS,
         decimals: 18,

@@ -7,6 +7,7 @@ import { unionBy } from "lodash";
 import { UserData } from "@beincom/aa-sdk";
 import {
   AuctionClosed,
+  CancelledAuction,
   Commitment,
   CreateAuction,
   ERC20Message,
@@ -215,6 +216,19 @@ const HistoriesPage = () => {
     );
   };
 
+  const renderCancelledAuction = (txType: string, history: CancelledAuction) => {
+    return (
+      <div className="mb-4 border-s-orange-50">
+        <p>{txType}</p>
+        <p>{history.transaction.id}</p>
+        <p>{history.transaction.timestamp}</p>
+        <p>AuctionId: {history.auction.auctionCreator}</p>
+        <p>TokenId: {history.auction.tokenId}</p>
+        <p>Asset contract: {history.auction.assetContract.name}</p>
+      </div>
+    );
+  };
+
   const renderErc20Released = (txType: string, history: ERC20Released) => {
     return (
       <div className="mb-4 border-s-orange-50">
@@ -248,10 +262,10 @@ const HistoriesPage = () => {
         <p>{txType}</p>
         <p>{history.transaction.id}</p>
         <p>{history.transaction.timestamp}</p>
-        <p>ListingCreator: {history.listingCreator}</p>
-        <p>Price: {history.pricePerToken}</p>
-        <p>Quantity: {history.quantity}</p>
-        <p>TokenId: {history.tokenId}</p>
+        <p>ListingCreator: {history.listingCreator} {history.listingCreatorUser?.username}</p>
+        <p>Price: {history.listing.pricePerToken}</p>
+        <p>Quantity: {history.listing.quantity}</p>
+        <p>TokenId: {history.listing.tokenId}</p>
         <p>Currency: {history.currency.name}</p>
         <p>Asset contract: {history.assetContract.name}</p>
       </div>
@@ -285,7 +299,6 @@ const HistoriesPage = () => {
       history.winningBidder.toLowerCase() ===
       walletInfo?.smartAccountAddress.toLowerCase();
     const { auction,collectToken, collectPayout, bidPayout } = history;
-    console.log("🚀 ~ renderAuctionClosed ~ auction:", auction.auctionId)
     if (isCreator) {
       if (collectPayout) {
         return (
@@ -396,6 +409,10 @@ const HistoriesPage = () => {
       if (txType === "createAuctions") {
         const historyData: CreateAuction = history;
         return renderCreateAuction(txType, historyData);
+      }
+      if(txType === "cancelledAuctions") {
+        const historyData: CancelledAuction = history;
+        return renderCancelledAuction(txType, historyData);
       }
       if (txType === "erc20Releaseds") {
         const historyData: ERC20Released = history;
