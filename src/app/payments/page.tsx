@@ -11,11 +11,13 @@ import { BIC_ADDRESS, ETH_WRAPPED_ADDRESS } from "@/utils";
 import { useCustomSnackBar } from "@/hooks";
 import { paymentService } from "@/utils/payments";
 import { SimulateResponse, UserData } from "@beincom/aa-sdk";
-import { bicSubgraph } from "@/utils/uniswap";
+
 
 const PaymentServicePage = () => {
   const [input0Value, setInput0Value] = useState("");
   const [networkFeeByBic, setNetworkFeeByBic] = useState<string>("0");
+  const [simulateFeeData, setSimulateFeeData] = useState<any>({});
+  console.log("🚀 ~ PaymentServicePage ~ simulateFeeData:", simulateFeeData)
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
 
   const [calldata, setCalldata] = useState<string>();
@@ -65,6 +67,7 @@ const PaymentServicePage = () => {
         true
       )) as SimulateResponse["changes"];
       setNetworkFeeByBic(res[0].amount);
+      setSimulateFeeData(res);
     } catch (error) {
       handleNotification(`fetchTransactionFee error: ${error}`, "error");
       console.log("🚀 ~ fetchTransactionFee ~ error:", error);

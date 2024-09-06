@@ -158,6 +158,7 @@ const HistoriesPage = () => {
         <p>To: {history.to}</p>
         <p>Name: {history.name}</p>
         <p>Price: {history.price}</p>
+        <p>MintType: {history.mintType}</p>
         <p>HandleName: {history.handle.name}</p>
       </div>
     );
