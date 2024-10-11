@@ -14,7 +14,7 @@ export const getToken = (): string => {
     return session?.id_token;
 }
 
-export const login = async (payload: { email: string, password: string, devices: any }) => {
+export const login = async (payload: { email: string, password: string, device: any }) => {
     const res = await axios.post<{ data: AuthSession }>(`${authEndpoint}/v1/auth/public/login`, payload);
     return res.data.data;
 }

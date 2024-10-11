@@ -14,13 +14,16 @@
     "@beincom/marketplace": "file:../bic-chain-sdk/packages/marketplace",
     "@beincom/payments": "file:../bic-chain-sdk/packages/payments",
     "@beincom/signers": "file:../bic-chain-sdk/packages/signers",
+    "@uniswap/router-sdk": "^1.11.1",
+    "abitype": "^1.0.6",
     "axios": "^1.7.2",
     "lodash": "^4.17.21",
     "next": "14.2.5",
     "notistack": "^3.0.1",
     "react": "^18",
     "react-dom": "^18",
-    "usehooks-ts": "^3.1.0"
+    "usehooks-ts": "^3.1.0",
+    "viem": "^2.21.19"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

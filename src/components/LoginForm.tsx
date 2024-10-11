@@ -46,7 +46,16 @@ const LoginForm: React.FC = () => {
 
     setLoginLoading(true);
     try {
-      const data = await login({ email, password, devices: [] });
+      const data = await login({
+        email,
+        password,
+        device: {
+          deviceId: "device",
+          deviceName: "IOS",
+          platform: "IOS",
+          application: "BIC_GROUP",
+        },
+      });
       setSession(data);
 
       const smartAccount = await getSmartAccount();

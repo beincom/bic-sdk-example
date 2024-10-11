@@ -5,7 +5,7 @@ import {
   UNISWAP_QUOTEV2_ADDRESS,
   UNISWAP_ROUTER_ADDRESS,
 } from "@/utils";
-import { UniswapAdapter, UniswapHelper } from "@beincom/dex";
+import { UniswapAdapter, UniswapHelper, UniswapUsingRouterSDK } from "@beincom/dex";
 import {} from "@beincom/aa-sdk";
 import { createBicSmartAccountClient } from "@beincom/aa-sdk/client";
 import * as auth from "./../wallet/auth";
@@ -18,9 +18,9 @@ export const uniswapHelper = new UniswapHelper({
   ethWrappedAddress: ETH_WRAPPED_ADDRESS,
   multicall3Address: "0xcA11bde05977b3631167028862bE2a173976CA11",
   providerUrl:
-    "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
+    "https://sepolia-rollup.arbitrum.io/rpc",
   graphUrl:
-    "https://api.studio.thegraph.com/query/75955/my-uniswapv3-arbitrum-sepolia/0.0.1",
+    "https://subgraph.satsuma-prod.com/c481113a1092/evol-tech--781851/uniswap-subgraph/api",
 });
 
 export const uniswapAdapter = new UniswapAdapter({
@@ -30,7 +30,17 @@ export const uniswapAdapter = new UniswapAdapter({
   ethWrappedAddress: ETH_WRAPPED_ADDRESS,
   quoterV2Address: UNISWAP_QUOTEV2_ADDRESS,
   providerUrl:
-    "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
+    "https://sepolia-rollup.arbitrum.io/rpc",
+});
+
+export const uniswapUsingRouterSDK = new UniswapUsingRouterSDK({
+  factoryAddress: UNISWAP_FACTORY_ADDRESS,
+  routerAddress: UNISWAP_ROUTER_ADDRESS,
+  ethNativeAddress: ETH_NATIVE_ADDRESS,
+  ethWrappedAddress: ETH_WRAPPED_ADDRESS,
+  quoterV2Address: UNISWAP_QUOTEV2_ADDRESS,
+  providerUrl:
+    "https://sepolia-rollup.arbitrum.io/rpc",
 });
 
 // export const bicSubgraph = createBicSubgraph({
@@ -43,5 +53,5 @@ export const uniswapAdapter = new UniswapAdapter({
 //     httpClient: auth.AxiosSingleton(),
 //   }),
 //   providerUrl:
-//     "https://arbitrum-sepolia.rpc.thirdweb.com/e1f8d427e28ebc5bb4e5ab5c38e8d665",
+//     "https://sepolia-rollup.arbitrum.io/rpc",
 // });

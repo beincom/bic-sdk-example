@@ -23,7 +23,7 @@ const MarketplacePage = () => {
   const { handleNotification } = useCustomSnackBar();
 
   const auctionId = "1";
-  const listingId = "8";
+  const listingId = "19";
   const offerId = "2";
   useEffect(() => {
     if (session) {
@@ -168,6 +168,33 @@ const MarketplacePage = () => {
 
   };
 
+  const handleEstCreateListing = async () => {
+    if(!smartAccount) { 
+      handleNotification("Please login first", "error");
+      return;
+    }
+    const res = await marketplace.createListing(walletInfo!.smartAccountAddress, {
+      tokenId: "67450960916127539259896136306566687704909636524553778509056067106384516850372",
+      currency: {
+        address: BIC_ADDRESS,
+        decimals: 18,
+        name:"",
+        symbol:""
+      },
+      pricePerToken: "10",
+      assetContract: NFT_ADDRESS,
+      quantity: "1",
+      startTimestamp: (Math.floor(Date.now() / 1000)).toString(),
+      endTimestamp: (Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7).toString(),
+      reserved: false,
+    });
+
+
+    const tx = await smartAccount.buildAndSendUserOperation({calldata: res.calldata}, true);
+    console.log("🚀 ~ handleCreateListing ~ tx:", tx)
+
+  };
+
   const handleCancelListing = async () => {
     if(!smartAccount) { 
       handleNotification("Please login first", "error");
@@ -188,6 +215,7 @@ const MarketplacePage = () => {
       handleNotification("Please login first", "error");
       return;
     }
+    const listing = await marketplace.getListing(Number(listingId));
     const res = await marketplace.buyNFTFromListing(walletInfo!.smartAccountAddress, {
       listingId: listingId,
       buyFor: walletInfo!.smartAccountAddress,
@@ -197,13 +225,26 @@ const MarketplacePage = () => {
         name:"",
         symbol:""
       },
-      expectedTotalPrice: "10",
+      expectedTotalPrice: "150",
       quantity: "1",
     });
 
 
     const tx = await smartAccount.buildAndSendUserOperation({calldata: res.calldata});
     console.log("🚀 ~ handleCreateListing ~ tx:", tx)
+
+  };
+
+  const handleGetListingId = async () => {
+    if(!smartAccount) { 
+      handleNotification("Please login first", "error");
+      return;
+    }
+    const txhash = "0x73fb097a253b17a598f62644272b813581b04a8c99690989ccbaf43c97e4fef4";
+    const listingId = await marketplace.getListingIdByTxHash(txhash);
+    console.log("🚀 ~ handleGetListingId ~ listingId:", listingId)
+
+
 
   };
 
@@ -339,6 +380,12 @@ const MarketplacePage = () => {
           Create Listing
         </button>
         <button
+          onClick={handleEstCreateListing}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4"
+        >
+          Estimate Create Listing
+        </button>
+        <button
           onClick={handleCancelListing}
           className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4"
         >
@@ -350,6 +397,13 @@ const MarketplacePage = () => {
           className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4"
         >
           Buy NFT
+        </button>
+
+        <button
+          onClick={handleGetListingId}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4"
+        >
+          Get listingId by TxHash
         </button>
       </div>
 

@@ -64,7 +64,7 @@ const PaymentServicePage = () => {
       if (!calldata) return;
       const res = (await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
-        true
+        true,
       )) as SimulateResponse["changes"];
       setNetworkFeeByBic(res[0].amount);
       setSimulateFeeData(res);
@@ -79,7 +79,7 @@ const PaymentServicePage = () => {
       if (!calldata) return;
       const res = (await smartAccount?.buildAndSendUserOperation(
         { calldata: calldata },
-        false
+        false,
       )) as SimulateResponse["changes"];
       console.log("🚀 ~ handleTip ~ res:", res);
     } catch (error) {

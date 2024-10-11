@@ -17,7 +17,7 @@ import {
 } from "@/utils";
 import { SimulateResponse } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
-import { uniswapHelper, uniswapAdapter } from "./../../utils/uniswap";
+import { uniswapHelper, uniswapAdapter, uniswapUsingRouterSDK } from "./../../utils/uniswap";
 
 const SwapTokenUniswap = () => {
   const [input1Value, setInput0Value] = useState("");
@@ -58,7 +58,7 @@ const SwapTokenUniswap = () => {
 
     const tokenIn =
       String(selectedPool.token0().address).toLowerCase() ===
-      selectedToken0.toLowerCase()
+        selectedToken0.toLowerCase()
         ? selectedPool.token0()
         : selectedPool.token1();
 
@@ -76,7 +76,7 @@ const SwapTokenUniswap = () => {
       {
         needDepositWETH: true, // Check tokenIn is WETH or ETH
         needWithdrawWETH: true,
-        needUseQuote: false,
+        needUseQuote: true,
       }
     );
     console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact)
@@ -103,7 +103,7 @@ const SwapTokenUniswap = () => {
 
     const tokenOut =
       String(selectedPool.token1().address).toLowerCase() ===
-      selectedToken1.toLowerCase()
+        selectedToken1.toLowerCase()
         ? selectedPool.token1()
         : selectedPool.token0();
     const exact = await uniswapAdapter.swapSingleExactAmountOut(
@@ -190,6 +190,23 @@ const SwapTokenUniswap = () => {
     }
   };
 
+  const handleSwapV2 = async () => {
+    try {
+      const { calldata:  calldataV2} = await uniswapUsingRouterSDK.swapExactInput();
+      const res = await smartAccount?.buildAndSendUserOperation(
+        { calldata: calldataV2 },
+        false
+      );
+      console.log("🚀 ~ handleSwap ~ res:", res);
+
+      handleNotification(`Swap success: ${res}`, "success");
+
+    } catch (error) {
+      handleNotification(`Swap error: ${error}`, "error");
+      setSwapLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (session) {
       getSmartAccount().then((account) => {
@@ -205,7 +222,6 @@ const SwapTokenUniswap = () => {
     );
     const pool = await uniswapHelper.constructPool(poolAddress, true);
     const poolHelper = new PoolHelper(pool);
-    console.log("🚀 ~ fetchPool ~ pool:", poolHelper.token0Price(), poolHelper.token1Price())
 
     setSelectedPoolAddress(poolAddress);
     setSelectedPool(poolHelper);
@@ -246,10 +262,25 @@ const SwapTokenUniswap = () => {
       return;
     }
 
-  //  const historical = await uniswapHelper.getHistoricalPrices(selectedPoolAddress as string);
-  //  console.log("🚀 ~ fetchAutoSlippage ~ historical:", historical)
-   
+    //  const historical = await uniswapHelper.getHistoricalPrices(selectedPoolAddress as string);
+    //  console.log("🚀 ~ fetchAutoSlippage ~ historical:", historical)
+
   };
+
+  const fetchPoolV2 = async () => {
+    const exact = await uniswapUsingRouterSDK.computeTrade()
+    console.log("🚀 ~ fetchPoolV2 ~ exact:", exact)
+
+    
+    setPriceImpact(exact.priceImpact);
+    setExecutionPrice(exact.executionPrice);
+    setMinimumAmountOut(exact.amountOutMin);
+    setAmountOut(exact.amountOut);
+    setMaximumAmountIn(exact.amountInMax);
+    setAmountIn(exact.amountIn);
+    setCalldata(exact.calldata);
+  };
+
 
 
   return (
@@ -284,7 +315,7 @@ const SwapTokenUniswap = () => {
         <p className="mb-4">Network cost: {networkFeeByBic} BIC</p>
       </div>
       <div className="mb-4">
-      <button
+        <button
           onClick={fetchPool}
           className="bg-purple-500 text-white mr-4 px-4 py-2 rounded-md"
         >
@@ -302,6 +333,12 @@ const SwapTokenUniswap = () => {
           className="bg-pink-500 text-white px-4 py-2 rounded-md"
         >
           Fetch auto slippage
+        </button>
+        <button
+          onClick={fetchPoolV2}
+          className="bg-purple-500 text-white mr-4 px-4 py-2 rounded-md"
+        >
+          Test V2
         </button>
       </div>
       <div className="mb-4">
@@ -373,6 +410,13 @@ const SwapTokenUniswap = () => {
         className="bg-blue-500 text-white px-4 py-2 rounded-md"
       >
         Fetch network cost
+      </button>
+
+      <button
+        onClick={handleSwapV2}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Fetch Swap V2
       </button>
     </div>
   );
