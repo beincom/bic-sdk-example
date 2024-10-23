@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
+import axios from "axios";
 
 import { IPoolHelper, PoolHelper } from "@beincom/dex";
 
@@ -282,6 +283,48 @@ const SwapTokenUniswap = () => {
   };
 
 
+  const testCallUniswapApi = async () => {
+    const apiUrl = "https://interface.gateway.uniswap.org/v2/quote";
+    const randomAmount = Math.random() * 1e2 * 1e18;
+    const payload = {
+        "tokenInChainId": 42161,
+        "tokenIn": "ETH",
+        "tokenOutChainId": 42161,
+        "tokenOut": "0x912CE59144191C1204E64559FE8253a0e49E6548",
+        "amount": randomAmount.toString(),
+        "sendPortionEnabled": true,
+        "type": "EXACT_INPUT",
+        "intent": "quote",
+        "configs": [
+            {
+                "enableUniversalRouter": true,
+                "protocols": [
+                    "V3"
+                ],
+                "routingType": "CLASSIC",
+                "recipient": "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
+                "enableFeeOnTransferFeeFetching": true
+            }
+        ],
+        "useUniswapX": false,
+        "swapper": "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
+        "slippageTolerance": "0.5"
+    }
+
+    try {
+      const response = await axios.post(apiUrl, payload, {
+        headers: {
+          "Origin":"https://app.uniswap.org",
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("🚀 ~ callApiPost ~ response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("🚀 ~ callApiPost ~ error:", error);
+
+    }
+  };
 
   return (
     <div className="bg-gray-200 p-4">
@@ -338,7 +381,7 @@ const SwapTokenUniswap = () => {
           onClick={fetchPoolV2}
           className="bg-purple-500 text-white mr-4 px-4 py-2 rounded-md"
         >
-          Test V2
+          Test Fetch V2
         </button>
       </div>
       <div className="mb-4">
@@ -417,6 +460,13 @@ const SwapTokenUniswap = () => {
         className="bg-blue-500 text-white px-4 py-2 rounded-md"
       >
         Fetch Swap V2
+      </button>
+
+      <button
+        onClick={testCallUniswapApi}
+        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Test Call public Uniswap Api
       </button>
     </div>
   );

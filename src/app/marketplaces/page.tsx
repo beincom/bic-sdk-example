@@ -23,7 +23,7 @@ const MarketplacePage = () => {
   const { handleNotification } = useCustomSnackBar();
 
   const auctionId = "1";
-  const listingId = "19";
+  const listingId = "47";
   const offerId = "2";
   useEffect(() => {
     if (session) {
@@ -225,7 +225,7 @@ const MarketplacePage = () => {
         name:"",
         symbol:""
       },
-      expectedTotalPrice: "150",
+      expectedTotalPrice: "10",
       quantity: "1",
     });
 

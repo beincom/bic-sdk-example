@@ -20,7 +20,7 @@ export const uniswapHelper = new UniswapHelper({
   providerUrl:
     "https://sepolia-rollup.arbitrum.io/rpc",
   graphUrl:
-    "https://subgraph.satsuma-prod.com/c481113a1092/evol-tech--781851/uniswap-subgraph/api",
+    "https://subgraph.satsuma-prod.com/33d1bbe97657/personal--1315332/uniswap-v3-arbitrumSepolia/api",
 });
 
 export const uniswapAdapter = new UniswapAdapter({
@@ -32,6 +32,7 @@ export const uniswapAdapter = new UniswapAdapter({
   providerUrl:
     "https://sepolia-rollup.arbitrum.io/rpc",
 });
+
 
 export const uniswapUsingRouterSDK = new UniswapUsingRouterSDK({
   factoryAddress: UNISWAP_FACTORY_ADDRESS,
