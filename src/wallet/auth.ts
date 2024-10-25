@@ -1,4 +1,5 @@
 import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
 import { AuthSession, UserProfile } from "@/types";
 
@@ -31,7 +32,10 @@ export const getProfile = async (username: string, payload: { accessToken: strin
 export const AxiosSingleton = ()=>{
     const session = JSON.parse(localStorage.getItem("session") || "{}");
     const single = axios.create({
-        headers: session.id_token
+        headers: {
+            'Authorization': session?.id_token,
+            'user': JSON.stringify(jwtDecode(session?.id_token)),
+        }
     });
     return single;
 }

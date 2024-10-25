@@ -18,13 +18,15 @@ import {
 } from "@/utils";
 import { SimulateResponse } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
-import { uniswapHelper, uniswapAdapter, uniswapUsingRouterSDK } from "./../../utils/uniswap";
+import { uniswapHelper, uniswapAdapter } from "./../../utils/uniswap";
+import { TradeTypeString } from "@beincom/dex";
 
 const SwapTokenUniswap = () => {
-  const [input1Value, setInput0Value] = useState("");
-  const [input2Value, setInput1Value] = useState("");
+  const [input0Value, setInput0Value] = useState("");
+  const [input1Value, setInput1Value] = useState("");
   const [selectedToken0, setSelectedToken0] = useState(BIC_ADDRESS);
   const [selectedToken1, setSelectedToken1] = useState(ETH_WRAPPED_ADDRESS);
+  const [tradeType, setTradeType] = useState<TradeTypeString>(TradeTypeString.EXACT_INPUT);
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
   const [selectedPool, setSelectedPool] = useState<IPoolHelper>();
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string>();
@@ -52,14 +54,14 @@ const SwapTokenUniswap = () => {
       return;
     }
     setInput0Value(event.target.value);
-
+    setTradeType(TradeTypeString.EXACT_INPUT);
     if (!selectedPool) {
       return;
     }
 
     const tokenIn =
       String(selectedPool.token0().address).toLowerCase() ===
-        selectedToken0.toLowerCase()
+      selectedToken0.toLowerCase()
         ? selectedPool.token0()
         : selectedPool.token1();
 
@@ -80,7 +82,7 @@ const SwapTokenUniswap = () => {
         needUseQuote: true,
       }
     );
-    console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact)
+    console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact);
 
     setInput1Value(exact.amountOut);
     setPriceImpact(exact.priceImpact);
@@ -97,14 +99,14 @@ const SwapTokenUniswap = () => {
       return;
     }
     setInput1Value(event.target.value);
-
+    setTradeType(TradeTypeString.EXACT_OUTPUT);
     if (!selectedPool) {
       return;
     }
 
     const tokenOut =
       String(selectedPool.token1().address).toLowerCase() ===
-        selectedToken1.toLowerCase()
+      selectedToken1.toLowerCase()
         ? selectedPool.token1()
         : selectedPool.token0();
     const exact = await uniswapAdapter.swapSingleExactAmountOut(
@@ -123,7 +125,7 @@ const SwapTokenUniswap = () => {
         needWithdrawWETH: true,
       }
     );
-    console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact)
+    console.log("🚀 ~ SwapTokenUniswap ~ exact:", exact);
 
     setInput0Value(exact.amountInMax);
     setPriceImpact(exact.priceImpact);
@@ -150,6 +152,7 @@ const SwapTokenUniswap = () => {
     }
 
     setSelectedToken1(event.target.value);
+
   };
 
   const fetchTransactionFee = async () => {
@@ -185,23 +188,6 @@ const SwapTokenUniswap = () => {
       setNetworkFeeByBic("0");
       fetchPool();
       setSwapLoading(false);
-    } catch (error) {
-      handleNotification(`Swap error: ${error}`, "error");
-      setSwapLoading(false);
-    }
-  };
-
-  const handleSwapV2 = async () => {
-    try {
-      const { calldata:  calldataV2} = await uniswapUsingRouterSDK.swapExactInput();
-      const res = await smartAccount?.buildAndSendUserOperation(
-        { calldata: calldataV2 },
-        false
-      );
-      console.log("🚀 ~ handleSwap ~ res:", res);
-
-      handleNotification(`Swap success: ${res}`, "success");
-
     } catch (error) {
       handleNotification(`Swap error: ${error}`, "error");
       setSwapLoading(false);
@@ -265,56 +251,84 @@ const SwapTokenUniswap = () => {
 
     //  const historical = await uniswapHelper.getHistoricalPrices(selectedPoolAddress as string);
     //  console.log("🚀 ~ fetchAutoSlippage ~ historical:", historical)
-
   };
 
   const fetchPoolV2 = async () => {
-    const exact = await uniswapUsingRouterSDK.computeTrade()
-    console.log("🚀 ~ fetchPoolV2 ~ exact:", exact)
+    try {
+      const res = await uniswapAdapter.swapSingleExact(
+        {
+          account: walletInfo?.smartAccountAddress || "",
+          amount: tradeType === TradeTypeString.EXACT_INPUT ? input0Value : input1Value,
+          type: tradeType,
+          tokenIn: {
+            address: selectedToken0,
+            decimals: 18,
+            name: "Default",
+            symbol: "Default",
+            chainId: 421614,
+          },
+          tokenOut: {
+            address: selectedToken1,
+            decimals: 18,
+            name: "Default",
+            symbol: "Default",
+            chainId: 421614,
+          },
+        },
+        {
+          deadline: 120,
+          recipient: walletInfo?.smartAccountAddress || "",
+          slippage: "5",
+        }
+      );
+      console.log("🚀 ~ fetchPoolV2 ~ res:", res);
 
-    
-    setPriceImpact(exact.priceImpact);
-    setExecutionPrice(exact.executionPrice);
-    setMinimumAmountOut(exact.amountOutMin);
-    setAmountOut(exact.amountOut);
-    setMaximumAmountIn(exact.amountInMax);
-    setAmountIn(exact.amountIn);
-    setCalldata(exact.calldata);
+      const info = await uniswapAdapter.getInfoFromTrade({trade: res.trade!});
+      console.log("🚀 ~ fetchPoolV2 ~ info:", info)
+
+      const fetchFee = await smartAccount?.buildAndSendUserOperation(
+        { calldata: res.calldata },
+        true
+      );
+      console.log("🚀 ~ fetchPoolV2 ~ fetchFee:", fetchFee);
+    } catch (error) {
+      console.log("🚀 ~ fetchPoolV2 ~ error:", error.message)
+      
+    }
   };
 
+  const handleSwapV2 = async () => {};
 
   const testCallUniswapApi = async () => {
     const apiUrl = "https://interface.gateway.uniswap.org/v2/quote";
     const randomAmount = Math.random() * 1e2 * 1e18;
     const payload = {
-        "tokenInChainId": 42161,
-        "tokenIn": "ETH",
-        "tokenOutChainId": 42161,
-        "tokenOut": "0x912CE59144191C1204E64559FE8253a0e49E6548",
-        "amount": randomAmount.toString(),
-        "sendPortionEnabled": true,
-        "type": "EXACT_INPUT",
-        "intent": "quote",
-        "configs": [
-            {
-                "enableUniversalRouter": true,
-                "protocols": [
-                    "V3"
-                ],
-                "routingType": "CLASSIC",
-                "recipient": "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
-                "enableFeeOnTransferFeeFetching": true
-            }
-        ],
-        "useUniswapX": false,
-        "swapper": "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
-        "slippageTolerance": "0.5"
-    }
+      tokenInChainId: 42161,
+      tokenIn: "ETH",
+      tokenOutChainId: 42161,
+      tokenOut: "0x912CE59144191C1204E64559FE8253a0e49E6548",
+      amount: randomAmount.toString(),
+      sendPortionEnabled: true,
+      type: "EXACT_INPUT",
+      intent: "quote",
+      configs: [
+        {
+          enableUniversalRouter: true,
+          protocols: ["V3"],
+          routingType: "CLASSIC",
+          recipient: "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
+          enableFeeOnTransferFeeFetching: true,
+        },
+      ],
+      useUniswapX: false,
+      swapper: "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
+      slippageTolerance: "0.5",
+    };
 
     try {
       const response = await axios.post(apiUrl, payload, {
         headers: {
-          "Origin":"https://app.uniswap.org",
+          Origin: "https://app.uniswap.org",
           "Content-Type": "application/json",
         },
       });
@@ -322,7 +336,6 @@ const SwapTokenUniswap = () => {
       return response.data;
     } catch (error) {
       console.error("🚀 ~ callApiPost ~ error:", error);
-
     }
   };
 
@@ -346,9 +359,7 @@ const SwapTokenUniswap = () => {
         <p className="mb-4">
           Mid price token1/token0: {selectedPool?.token1Price()}
         </p>
-        <p className="mb-4">
-          Execution price: {executionPrice}
-        </p>
+        <p className="mb-4">Execution price: {executionPrice}</p>
         <p className="mb-4">Price impact: {priceImpact}%</p>
         <p className="mb-4">Amount out: {amountOut}</p>
         <p className="mb-4">Minimum amount out receive: {minimumAmountOut}</p>
@@ -373,13 +384,13 @@ const SwapTokenUniswap = () => {
 
         <button
           onClick={fetchAutoSlippage}
-          className="bg-pink-500 text-white px-4 py-2 rounded-md"
+          className="bg-pink-500 text-white px-4 py-2 mr-4 rounded-md"
         >
           Fetch auto slippage
         </button>
         <button
           onClick={fetchPoolV2}
-          className="bg-purple-500 text-white mr-4 px-4 py-2 rounded-md"
+          className="bg-purple-500 text-white mr-4 px-4 py-2  mr-4 rounded-md"
         >
           Test Fetch V2
         </button>
@@ -406,7 +417,7 @@ const SwapTokenUniswap = () => {
             className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="amount0"
             type="number"
-            value={input1Value}
+            value={input0Value}
             onChange={handleInput0Change}
             placeholder="Enter amount0"
           />
@@ -435,7 +446,7 @@ const SwapTokenUniswap = () => {
             className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="amount1"
             type="number"
-            value={input2Value}
+            value={input1Value}
             onChange={handleInput1Change}
             placeholder="Enter amount1"
           />
@@ -444,27 +455,27 @@ const SwapTokenUniswap = () => {
 
       <button
         onClick={handleSwap}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        className="bg-blue-500 text-white px-4 py-2 mr-4 rounded-md"
       >
         {swapLoading ? "Loading" : "Swap"}
       </button>
       <button
         onClick={fetchTransactionFee}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        className="bg-blue-500 text-white px-4 py-2 mr-4 rounded-md"
       >
         Fetch network cost
       </button>
 
       <button
         onClick={handleSwapV2}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        className="bg-blue-500 text-white px-4 py-2 mr-4 rounded-md"
       >
         Fetch Swap V2
       </button>
 
       <button
         onClick={testCallUniswapApi}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        className="bg-blue-500 text-white px-4 py-2 mr-4 rounded-md"
       >
         Test Call public Uniswap Api
       </button>

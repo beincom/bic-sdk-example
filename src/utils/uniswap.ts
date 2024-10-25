@@ -5,7 +5,7 @@ import {
   UNISWAP_QUOTEV2_ADDRESS,
   UNISWAP_ROUTER_ADDRESS,
 } from "@/utils";
-import { UniswapAdapter, UniswapHelper, UniswapUsingRouterSDK } from "@beincom/dex";
+import { UniswapAdapter, UniswapHelper } from "@beincom/dex";
 import {} from "@beincom/aa-sdk";
 import { createBicSmartAccountClient } from "@beincom/aa-sdk/client";
 import * as auth from "./../wallet/auth";
@@ -31,17 +31,10 @@ export const uniswapAdapter = new UniswapAdapter({
   quoterV2Address: UNISWAP_QUOTEV2_ADDRESS,
   providerUrl:
     "https://sepolia-rollup.arbitrum.io/rpc",
-});
-
-
-export const uniswapUsingRouterSDK = new UniswapUsingRouterSDK({
-  factoryAddress: UNISWAP_FACTORY_ADDRESS,
-  routerAddress: UNISWAP_ROUTER_ADDRESS,
-  ethNativeAddress: ETH_NATIVE_ADDRESS,
-  ethWrappedAddress: ETH_WRAPPED_ADDRESS,
-  quoterV2Address: UNISWAP_QUOTEV2_ADDRESS,
-  providerUrl:
-    "https://sepolia-rollup.arbitrum.io/rpc",
+    client: createBicSmartAccountClient({
+      endpoint: endPointUrl,
+      httpClient: auth.AxiosSingleton(),
+  }),
 });
 
 // export const bicSubgraph = createBicSubgraph({
