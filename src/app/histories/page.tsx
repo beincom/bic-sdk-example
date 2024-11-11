@@ -22,6 +22,7 @@ import {
   NewSale,
   ShareRevenue,
   Swap,
+  TypeEventEnum,
 } from "@beincom/aa-sdk/types";
 
 import { AuthSession, BicSmartAccount, WalletInfo } from "@/types";
@@ -251,6 +252,8 @@ const HistoriesPage = () => {
         <p>{history.transaction.timestamp}</p>
         <p>From: {history.from}</p>
         <p>To: {history.to}</p>
+        <p>TokenId: {history.tokenId}</p>
+        <p>Local Name: {history.localName}</p>
         <p>amount: {history.amount}</p>
         <p>Currency: BIC</p>
       </div>
@@ -377,13 +380,13 @@ const HistoriesPage = () => {
       return null;
     }
 
-    const historyItems = histories.map((history: any, index) => {
-      const txType = history.txType;
-      if (txType === "swaps") {
+    const historyItems = histories.map((history: any) => {
+      const txType = history.txType as TypeEventEnum;
+      if (txType === TypeEventEnum.SWAPS) {
         const historyData: Swap = history;
         return renderSwap(txType, historyData);
       }
-      if (txType === "erc20Transfers") {
+      if (txType === TypeEventEnum.ERC20_TRANSFERS) {
         const historyData: ERC20Transfer = history;
         return renderERC20Transfer(txType, historyData);
       }

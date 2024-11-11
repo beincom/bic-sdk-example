@@ -15,6 +15,7 @@ import {
   ETH_NATIVE_ADDRESS,
   FUSDT_ADDRESS,
   ETH_WRAPPED_ADDRESS,
+  GARBAGE_ADDRESS,
 } from "@/utils";
 import { SimulateResponse } from "@beincom/aa-sdk";
 import { useCustomSnackBar } from "@/hooks";
@@ -26,7 +27,9 @@ const SwapTokenUniswap = () => {
   const [input1Value, setInput1Value] = useState("");
   const [selectedToken0, setSelectedToken0] = useState(BIC_ADDRESS);
   const [selectedToken1, setSelectedToken1] = useState(ETH_WRAPPED_ADDRESS);
-  const [tradeType, setTradeType] = useState<TradeTypeString>(TradeTypeString.EXACT_INPUT);
+  const [tradeType, setTradeType] = useState<TradeTypeString>(
+    TradeTypeString.EXACT_INPUT
+  );
   const [smartAccount, setSmartAccount] = useState<BicSmartAccount>();
   const [selectedPool, setSelectedPool] = useState<IPoolHelper>();
   const [selectedPoolAddress, setSelectedPoolAddress] = useState<string>();
@@ -152,7 +155,6 @@ const SwapTokenUniswap = () => {
     }
 
     setSelectedToken1(event.target.value);
-
   };
 
   const fetchTransactionFee = async () => {
@@ -258,7 +260,10 @@ const SwapTokenUniswap = () => {
       const res = await uniswapAdapter.swapSingleExact(
         {
           account: walletInfo?.smartAccountAddress || "",
-          amount: tradeType === TradeTypeString.EXACT_INPUT ? input0Value : input1Value,
+          amount:
+            tradeType === TradeTypeString.EXACT_INPUT
+              ? input0Value
+              : input1Value,
           type: tradeType,
           tokenIn: {
             address: selectedToken0,
@@ -283,17 +288,16 @@ const SwapTokenUniswap = () => {
       );
       console.log("🚀 ~ fetchPoolV2 ~ res:", res);
 
-      const info = await uniswapAdapter.getInfoFromTrade({trade: res.trade!});
-      console.log("🚀 ~ fetchPoolV2 ~ info:", info)
+      const info = await uniswapAdapter.getInfoFromTrade({ trade: res.trade! });
+      console.log("🚀 ~ fetchPoolV2 ~ info:", info);
 
       const fetchFee = await smartAccount?.buildAndSendUserOperation(
         { calldata: res.calldata },
-        true
+        false
       );
       console.log("🚀 ~ fetchPoolV2 ~ fetchFee:", fetchFee);
     } catch (error) {
-      console.log("🚀 ~ fetchPoolV2 ~ error:", error.message)
-      
+      console.log("🚀 ~ fetchPoolV2 ~ error:", error.message);
     }
   };
 
@@ -337,6 +341,18 @@ const SwapTokenUniswap = () => {
     } catch (error) {
       console.error("🚀 ~ callApiPost ~ error:", error);
     }
+  };
+
+  const selectTokens = () => {
+    return (
+      <>
+        <option value={ETH_NATIVE_ADDRESS}>ETH</option>
+        <option value={ETH_WRAPPED_ADDRESS}>WETH</option>
+        <option value={FUSDT_ADDRESS}>FUST</option>
+        <option value={BIC_ADDRESS}>BIC</option>
+        <option value={GARBAGE_ADDRESS}>Garbage</option>
+      </>
+    );
   };
 
   return (
@@ -408,10 +424,7 @@ const SwapTokenUniswap = () => {
             onChange={handleToken0Change}
             className="border border-gray-300 rounded-md px-2 py-1 mb-2"
           >
-            <option value={ETH_NATIVE_ADDRESS}>ETH</option>
-            <option value={ETH_WRAPPED_ADDRESS}>WETH</option>
-            <option value={FUSDT_ADDRESS}>FUST</option>
-            <option value={BIC_ADDRESS}>BIC</option>
+            {selectTokens()}
           </select>
           <input
             className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -437,10 +450,7 @@ const SwapTokenUniswap = () => {
             onChange={handleToken1Change}
             className="border border-gray-300 rounded-md px-2 py-1 mb-2"
           >
-            <option value={ETH_NATIVE_ADDRESS}>ETH</option>
-            <option value={ETH_WRAPPED_ADDRESS}>WETH</option>
-            <option value={FUSDT_ADDRESS}>FUST</option>
-            <option value={BIC_ADDRESS}>BIC</option>
+            {selectTokens()}
           </select>
           <input
             className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"

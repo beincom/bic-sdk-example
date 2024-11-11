@@ -22,8 +22,8 @@ const MarketplacePage = () => {
 
   const { handleNotification } = useCustomSnackBar();
 
-  const auctionId = "1";
-  const listingId = "47";
+  const auctionId = "33";
+  const listingId = "50";
   const offerId = "2";
   useEffect(() => {
     if (session) {
@@ -54,12 +54,13 @@ const MarketplacePage = () => {
       return;
     }
     const res = await marketplace.createAuction(walletInfo!.smartAccountAddress, {
-      tokenId: "67450960916127539259896136306566687704909636524553778509056067106384516850372",
+      tokenId: "90501550622844987212612162453101612412239736701136980783439845901529882700848",
       currency: {
         address: BIC_ADDRESS,
         decimals: 18,
         name:"",
-        symbol:""
+        symbol:"",
+        chainId: 1
       },
       assetContract: NFT_ADDRESS,
       bidBufferBps: "200",
@@ -88,7 +89,8 @@ const MarketplacePage = () => {
         address: BIC_ADDRESS,
         decimals: 18,
         name:"",
-        symbol:""
+        symbol:"",
+        chainId: 1
       },
      
     });
@@ -147,12 +149,13 @@ const MarketplacePage = () => {
       return;
     }
     const res = await marketplace.createListing(walletInfo!.smartAccountAddress, {
-      tokenId: "67450960916127539259896136306566687704909636524553778509056067106384516850372",
+      tokenId: "90501550622844987212612162453101612412239736701136980783439845901529882700848",
       currency: {
         address: BIC_ADDRESS,
         decimals: 18,
         name:"",
-        symbol:""
+        symbol:"",
+        chainId: 1,
       },
       pricePerToken: "10",
       assetContract: NFT_ADDRESS,
@@ -174,12 +177,13 @@ const MarketplacePage = () => {
       return;
     }
     const res = await marketplace.createListing(walletInfo!.smartAccountAddress, {
-      tokenId: "67450960916127539259896136306566687704909636524553778509056067106384516850372",
+      tokenId: "90501550622844987212612162453101612412239736701136980783439845901529882700848",
       currency: {
         address: BIC_ADDRESS,
         decimals: 18,
         name:"",
-        symbol:""
+        symbol:"",
+        chainId: 1
       },
       pricePerToken: "10",
       assetContract: NFT_ADDRESS,
@@ -223,7 +227,8 @@ const MarketplacePage = () => {
         address: BIC_ADDRESS,
         decimals: 18,
         name:"",
-        symbol:""
+        symbol:"",
+        chainId: 1
       },
       expectedTotalPrice: "10",
       quantity: "1",
@@ -259,7 +264,8 @@ const MarketplacePage = () => {
         address: BIC_ADDRESS,
         decimals: 18,
         name:"",
-        symbol:""
+        symbol:"",
+        chainId: 1
       },
       totalPrice: "12.55",
       assetContract: NFT_ADDRESS,
