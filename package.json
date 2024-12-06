@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@beincom/aa-coinbase": "file:../bic-chain-sdk/packages/aa-coinbase",
     "@beincom/aa-sdk": "file:../bic-chain-sdk/packages/aa",
     "@beincom/dex": "file:../bic-chain-sdk/packages/dex",
     "@beincom/marketplace": "file:../bic-chain-sdk/packages/marketplace",
     "@beincom/payments": "file:../bic-chain-sdk/packages/payments",
     "@beincom/signers": "file:../bic-chain-sdk/packages/signers",
+    "@rainbow-me/rainbowkit": "^2.2.1",
+    "@tanstack/react-query": "^5.62.2",
     "@uniswap/router-sdk": "^1.11.1",
     "abitype": "^1.0.6",
     "axios": "^1.7.2",
@@ -25,7 +28,8 @@
     "react": "^18",
     "react-dom": "^18",
     "usehooks-ts": "^3.1.0",
-    "viem": "^2.21.19"
+    "viem": "^2.21.54",
+    "wagmi": "^2.13.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

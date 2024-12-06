@@ -8,7 +8,7 @@ import { VariantType, useSnackbar } from "notistack";
 export const useCustomSnackBar = () => {
   const { enqueueSnackbar } = useSnackbar();
   const handleNotification = (message: string, variant: VariantType) => {
-    enqueueSnackbar(message, {
+    enqueueSnackbar(message || "Unknown", {
       variant,
       anchorOrigin: { vertical: "top", horizontal: "right" },
     });

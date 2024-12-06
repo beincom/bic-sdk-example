@@ -5,8 +5,12 @@ import { ArbitrumSepolia, deriveChain } from '@beincom/aa-sdk/chains';
 import { createBicSmartAccount } from '@beincom/aa-sdk/smart-account';
 
 import { createBicSmartAccountClient } from '@beincom/aa-sdk/client';
+import { createSmartAccountController } from '@beincom/aa-coinbase';
 import * as auth from "./auth";
 import { BicSmartAccount } from "@/types";
+import { arbitrumSepolia } from "viem/chains";
+import { MockSigner } from "./mock-signer";
+import { BIC_ADDRESS } from "@/utils";
 
 
 
@@ -44,4 +48,19 @@ export async function getSmartAccount() {
         chain,
     })
     return smartAccount
+}
+
+
+let coinbaseSmartAccount: Awaited<ReturnType<typeof createSmartAccountController>>;
+export async function getCoinbaseSmartAccount() {
+    if (coinbaseSmartAccount) return coinbaseSmartAccount
+    const mpcAccount = new MockSigner();
+    coinbaseSmartAccount = await createSmartAccountController(arbitrumSepolia, {
+        debug: true,
+        bundlerUrl: 'https://arb-sepolia.g.alchemy.com/v2/gA53VZ-kip4A01xx5mT2pKG3FbpKO1OW',
+        mpcAccount: mpcAccount,
+        paymasterAddress: BIC_ADDRESS,
+        bicAddress: BIC_ADDRESS,
+    })
+    return coinbaseSmartAccount
 }

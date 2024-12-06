@@ -50,10 +50,10 @@ const LoginForm: React.FC = () => {
         email,
         password,
         device: {
-          deviceId: "device",
-          deviceName: "IOS",
-          platform: "IOS",
-          application: "BIC_GROUP",
+          "device_id": "9247532c-0f7d-4c02-8282-4b5d00879e1d",
+          "device_name": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          "application": "BIC_GROUP",
+          "platform": "WEB"
         },
       });
       setSession(data);
