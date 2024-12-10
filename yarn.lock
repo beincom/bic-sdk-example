@@ -45,7 +45,7 @@
     ethers "5.7.2"
 
 "@beincom/marketplace@file:../bic-chain-sdk/packages/marketplace":
-  version "0.0.3"
+  version "0.0.4-dev"
   resolved "file:../bic-chain-sdk/packages/marketplace"
   dependencies:
     "@beincom/chain-shared" "*"
