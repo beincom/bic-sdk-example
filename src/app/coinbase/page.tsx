@@ -207,7 +207,7 @@ const CoinbasePage = () => {
     }
     const TOKEN_ID = "0";
     const GIRL_COLLECTION_ADDRESS = "0xf2b7C765EE2976eF41B78aF2B6552d1C535B3cfA";
-    const data = await smartAccount?.getRequestHandleCalldata({
+    const data = await smartAccount?.getTransferERC721Calldata({
       to: DEFAULT_TO_ADDRESS,
       tokenId: TOKEN_ID,
       token: {
@@ -223,17 +223,17 @@ const CoinbasePage = () => {
     if(!smartAccount) { 
       return;
     }
-
+    const dateUnix = Math.floor(Date.now() / 1000);
     const data = await smartAccount?.getRequestHandleCalldata(
       {
-        value: "test",
+        value: `test.${dateUnix}`,
         type: NFTType.ENFT,
         entity: NFTEntity.USERNAME,
       },
       {
-        // headers: {
-        //   Authorization: window?.localStorage?.getItem(store_key),
-        // },
+        headers: {
+          Authorization: session?.access_token
+        },
       },
     ); 
     const receipt = await smartAccount?.executeTransactionWithCallData(data, isSimulate);
