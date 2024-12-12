@@ -17,11 +17,17 @@ import { owner0, owner1 } from "@/wallet/mock-signer";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { BIC_ADDRESS, NFT_ADDRESS, USDT_ADDRESS, USDT_ADDRESS_DEV } from "@/utils";
+import {
+  BIC_ADDRESS,
+  NFT_ADDRESS,
+  USDT_ADDRESS,
+  USDT_ADDRESS_DEV,
+} from "@/utils";
 import LoginForm from "@/components/LoginForm";
 import { NFTEntity, NFTType } from "@beincom/aa-sdk";
 import { uniswapAdapter, uniswapHelper } from "@/utils/uniswap";
 import { PoolHelper } from "@beincom/dex";
+import { marketplace } from "@/utils/marketplace";
 
 enum SignerType {
   MPC = "mpc",
@@ -289,8 +295,7 @@ const CoinbasePage = () => {
       data,
       isSimulate
     );
-    console.log("🚀 ~ onClaimBICAuction ~ receipt:", receipt)
-
+    console.log("🚀 ~ onClaimBICAuction ~ receipt:", receipt);
   };
 
   const isCanClaimAuction = async () => {
@@ -299,8 +304,7 @@ const CoinbasePage = () => {
     }
 
     const data = await smartAccount?.isClaimedAuction("64");
-    console.log("🚀 ~ isCanClaimAuction ~ data:", data)
-    
+    console.log("🚀 ~ isCanClaimAuction ~ data:", data);
   };
 
   const onGetRedemption = async () => {
@@ -320,13 +324,13 @@ const CoinbasePage = () => {
     const data = await smartAccount.getRedeemVoucherTokenCallData({
       redemptionAddress: "0xCD91d67E4B910e389b783C58025e8ae19C1172aE",
     });
-    console.log("🚀 ~ onRedeemVoucher ~ data:", data)
+    console.log("🚀 ~ onRedeemVoucher ~ data:", data);
 
     const receipt = await smartAccount.executeTransactionWithCallData(
       data,
       isSimulate
     );
-    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt)
+    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt);
   };
 
   const onSwapBICIn = async () => {
@@ -336,29 +340,32 @@ const CoinbasePage = () => {
 
     const poolAddress = await uniswapHelper.computePoolAddress(
       BIC_ADDRESS,
-      USDT_ADDRESS_DEV,
+      USDT_ADDRESS_DEV
     );
     const pool = await uniswapHelper.constructPool(poolAddress, true);
     const poolHelper = new PoolHelper(pool);
 
-
-    const data = await uniswapAdapter.swapSingleExactAmountIn({
-      amount: "15",
-      pools: [poolHelper.pool],
-      token: poolHelper.token1(),
-    }, {
-      deadline: Math.floor(Date.now() / 1000) + 60,
-      recipient: smartAddress || "",
-      slippage: "5",
-    }, {
-      needDepositWETH: false,
-      needUseQuote: false,
-      needWithdrawWETH: false,
-    })
+    const data = await uniswapAdapter.swapSingleExactAmountIn(
+      {
+        amount: "15",
+        pools: [poolHelper.pool],
+        token: poolHelper.token1(),
+      },
+      {
+        deadline: Math.floor(Date.now() / 1000) + 60,
+        recipient: smartAddress || "",
+        slippage: "5",
+      },
+      {
+        needDepositWETH: false,
+        needUseQuote: false,
+        needWithdrawWETH: false,
+      }
+    );
     // const data = await smartAccount.getRedeemVoucherTokenCallData({
     //   redemptionAddress: "0xCD91d67E4B910e389b783C58025e8ae19C1172aE",
     // });
-    console.log("🚀 ~ onRedeemVoucher ~ data:", data)
+    console.log("🚀 ~ onRedeemVoucher ~ data:", data);
 
     const receipt = await smartAccount.executeTransactionWithCallData(
       {
@@ -366,7 +373,7 @@ const CoinbasePage = () => {
       },
       isSimulate
     );
-    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt)
+    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt);
   };
 
   const onSwapBICOut = async () => {
@@ -376,29 +383,32 @@ const CoinbasePage = () => {
 
     const poolAddress = await uniswapHelper.computePoolAddress(
       BIC_ADDRESS,
-      USDT_ADDRESS_DEV,
+      USDT_ADDRESS_DEV
     );
     const pool = await uniswapHelper.constructPool(poolAddress, true);
     const poolHelper = new PoolHelper(pool);
 
-
-    const data = await uniswapAdapter.swapSingleExactAmountOut({
-      amount: "15",
-      pools: [poolHelper.pool],
-      token: poolHelper.token0(),
-    }, {
-      deadline: Math.floor(Date.now() / 1000) + 60,
-      recipient: smartAddress || "",
-      slippage: "5",
-    }, {
-      needDepositWETH: false,
-      needUseQuote: false,
-      needWithdrawWETH: false,
-    })
+    const data = await uniswapAdapter.swapSingleExactAmountOut(
+      {
+        amount: "15",
+        pools: [poolHelper.pool],
+        token: poolHelper.token0(),
+      },
+      {
+        deadline: Math.floor(Date.now() / 1000) + 60,
+        recipient: smartAddress || "",
+        slippage: "5",
+      },
+      {
+        needDepositWETH: false,
+        needUseQuote: false,
+        needWithdrawWETH: false,
+      }
+    );
     // const data = await smartAccount.getRedeemVoucherTokenCallData({
     //   redemptionAddress: "0xCD91d67E4B910e389b783C58025e8ae19C1172aE",
     // });
-    console.log("🚀 ~ onRedeemVoucher ~ data:", data)
+    console.log("🚀 ~ onRedeemVoucher ~ data:", data);
 
     const receipt = await smartAccount.executeTransactionWithCallData(
       {
@@ -406,7 +416,48 @@ const CoinbasePage = () => {
       },
       isSimulate
     );
-    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt)
+    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt);
+  };
+
+  const onBidingAuction = async () => {
+    if (!smartAccount) {
+      return;
+    }
+
+    const data = await marketplace.bidInAuction({
+      auctionId: "64",
+      bidAmount: "0.1",
+      currency: { address: BIC_ADDRESS, decimals: 18, name: "BIC", symbol: "BIC" },
+    });
+    console.log("🚀 ~ onRedeemVoucher ~ data:", data);
+
+    const receipt = await smartAccount.executeTransactionWithCallData(
+      {
+        callData: data.calldata as `0x${string}`,
+      },
+      isSimulate
+    );
+    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt);
+  };
+
+  const onCollectPayout = async () => {
+    if (!smartAccount) {
+      return;
+    }
+
+    const data = await marketplace.collectAuctionPayout({
+      auctionId: "61",
+    });
+    console.log("🚀 ~ onCollectPayout ~ data:", data)
+
+
+    const receipt = await smartAccount.executeTransactionWithCallData(
+      {
+        callData: data.calldata as `0x${string}`,
+      },
+      isSimulate
+    );
+    console.log("🚀 ~ onCollectPayout ~ receipt:", receipt)
   };
 
   return (
@@ -549,12 +600,22 @@ const CoinbasePage = () => {
       </div>
       <div className="mb-5 bg-white border border-gray-300 shadow-md p-5 rounded">
         <h2 className="text-2xl font-bold mb-3">Marketplace Card</h2>
-        {/* Marketplace content will go here */}
+        <button
+          onClick={onBidingAuction}
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
+        >
+          Bid auction
+        </button>
+
+        <button
+          onClick={onCollectPayout}
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
+        >
+          Collect Payout
+        </button>
       </div>
       <div className="mb-5 bg-white border border-gray-300 shadow-md p-5 rounded">
         <h2 className="text-2xl font-bold mb-3">Handle Controller Card</h2>
-        {/* Marketplace content will go here */}
-        
         <button
           onClick={onRequestHandle}
           className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
