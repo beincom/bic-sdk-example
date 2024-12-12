@@ -20,7 +20,7 @@ export const uniswapHelper = new UniswapHelper({
   providerUrl:
     "https://sepolia-rollup.arbitrum.io/rpc",
   graphUrl:
-    "https://subgraph.satsuma-prod.com/33d1bbe97657/personal--1315332/uniswap-v3-arbitrumSepolia/api",
+    "https://subgraph.satsuma-prod.com/c481113a1092/evol-tech--781851/uniswap-subgraph/api",
 });
 
 export const uniswapAdapter = new UniswapAdapter({
@@ -31,10 +31,6 @@ export const uniswapAdapter = new UniswapAdapter({
   quoterV2Address: UNISWAP_QUOTEV2_ADDRESS,
   providerUrl:
     "https://sepolia-rollup.arbitrum.io/rpc",
-    client: createBicSmartAccountClient({
-      endpoint: endPointUrl,
-      httpClient: auth.AxiosSingleton(),
-  }),
 });
 
 // export const bicSubgraph = createBicSubgraph({
