@@ -2,7 +2,7 @@ import { useCustomSnackBar } from "@/hooks";
 import { AuthSession, UserProfile, WalletInfo } from "@/types";
 import { getSmartAccount, signer } from "@/wallet";
 import { getProfile, login } from "@/wallet/auth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 const LoginForm: React.FC = () => {
@@ -41,10 +41,10 @@ const LoginForm: React.FC = () => {
     setWalletPassword(e.target.value);
   };
 
-  const handleLogin = async (e: any) => {
-    e.preventDefault();
 
-    setLoginLoading(true);
+  
+
+  const handleLoginCore = async () => {
     try {
       const data = await login({
         email,
@@ -74,8 +74,18 @@ const LoginForm: React.FC = () => {
       setIsLogin(false);
       handleNotification(error?.response?.data?.data?.message, "error");
     }
+  }
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+
+    setLoginLoading(true);
+    await handleLoginCore();
     setLoginLoading(false);
   };
+
+  useEffect(() => {
+    handleLoginCore();
+  }, []);
 
   const handleLoginWallet = async () => {
     // Handle form submission logic here

@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@beincom/aa-coinbase": "file:../bic-chain-sdk/packages/aa-coinbase",
-    "@beincom/chain-shared": "file:../bic-chain-sdk/packages/shared",
     "@beincom/aa-sdk": "file:../bic-chain-sdk/packages/aa",
+    "@beincom/chain-shared": "file:../bic-chain-sdk/packages/shared",
     "@beincom/dex": "file:../bic-chain-sdk/packages/dex",
     "@beincom/marketplace": "file:../bic-chain-sdk/packages/marketplace",
     "@beincom/payments": "file:../bic-chain-sdk/packages/payments",

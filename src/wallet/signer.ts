@@ -3,14 +3,17 @@ import axios from "axios";
 import { createBicSigner, } from '@beincom/signers/bic';
 import { ArbitrumSepolia, deriveChain } from '@beincom/aa-sdk/chains';
 import { createBicSmartAccount } from '@beincom/aa-sdk/smart-account';
+import { createBundlerClient, toCoinbaseSmartAccount } from 'viem/account-abstraction'
 
 import { createBicSmartAccountClient } from '@beincom/aa-sdk/client';
 import { createSmartAccountController } from '@beincom/aa-coinbase';
 import * as auth from "./auth";
 import { BicSmartAccount } from "@/types";
 
-import { MockSigner } from "./mock-signer";
+import { MockSigner, owner0 } from "./mock-signer";
 import { BIC_ADDRESS } from "@/utils";
+import { createPublicClient, http } from "viem";
+import { arbitrumSepolia } from "viem/chains";
 
 
 
@@ -53,27 +56,51 @@ export async function getSmartAccount() {
 
 let coinbaseSmartAccount: Awaited<ReturnType<typeof createSmartAccountController>>;
 export async function getCoinbaseSmartAccount() {
-    if (coinbaseSmartAccount) return coinbaseSmartAccount
-    const mpcAccount = new MockSigner();
-    const token = await auth.getToken();
-    if (!token) {
-        throw new Error('token not found')
+    try {
+        if (coinbaseSmartAccount) return coinbaseSmartAccount
+        const mpcAccount = new MockSigner();
+        const token = await auth.getToken();
+        if (!token) {
+            throw new Error('token not found')
+        }
+        coinbaseSmartAccount = await createSmartAccountController(
+            token,
+            {
+                debug: true,
+                // bundlerUrl: 'https://arb-sepolia.g.alchemy.com/v2/gA53VZ-kip4A01xx5mT2pKG3FbpKO1OW',
+                signer: mpcAccount,
+                client: createBicSmartAccountClient({
+                    endpoint: endPointUrl,
+                    httpClient: auth.AxiosSingleton(),
+                }),
+                smartWalletAddress: null,
+                passkeyCredential: "",
+                chain: arbitrumSepolia,
+                // paymasterAddress: BIC_ADDRESS,
+                // bicAddress: BIC_ADDRESS,
+            })
+        return coinbaseSmartAccount
+    } catch (error) {
+        console.log("🚀 ~ getCoinbaseSmartAccount ~ error:", error)
     }
-    coinbaseSmartAccount = await createSmartAccountController(
-        token,
-        {
-            debug: true,
-            // bundlerUrl: 'https://arb-sepolia.g.alchemy.com/v2/gA53VZ-kip4A01xx5mT2pKG3FbpKO1OW',
-            signer: mpcAccount,
-            client: createBicSmartAccountClient({
-                endpoint: endPointUrl,
-                httpClient: auth.AxiosSingleton(),
-            }),
-            smartWalletAddress: null,
-            passkeyCredential: "",
-            chain: ArbitrumSepolia as any,
-            // paymasterAddress: BIC_ADDRESS,
-            // bicAddress: BIC_ADDRESS,
-        })
-    return coinbaseSmartAccount
+}
+
+export const getTestAccount = async () => {
+
+    const account = await toCoinbaseSmartAccount({
+        client: createPublicClient({
+            chain: arbitrumSepolia,
+            transport: http(),
+        }),
+        owners: [owner0]
+    })
+    const bundlerClient = createBundlerClient({
+        account,
+        client: createPublicClient({
+            chain: arbitrumSepolia,
+            transport: http(),
+        }),
+        transport: http('https://arb-sepolia.g.alchemy.com/v2/gA53VZ-kip4A01xx5mT2pKG3FbpKO1OW'),
+    })
+    return bundlerClient
 }

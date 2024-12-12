@@ -18,7 +18,12 @@ export const owner2 = privateKeyToAccount("0x13e67a6b0dc27298c9efd43673ede7607c0
 
 
 export class MockSigner implements ISigner {
-    private _account: PrivateKeyAccount = owner0;
+    private _account: PrivateKeyAccount;
+
+    constructor() { 
+        this._account = owner0;
+        console.log("🚀 ~ MockSigner ~ constructor ~ this._account:", this._account.address)
+    }
 
     public startSession(accessToken: string) {
         throw new Error("Method not implemented.");
@@ -42,7 +47,6 @@ export class MockSigner implements ISigner {
     }
 
     public async signMessage(message: string | Uint8Array): Promise<string> {
-        console.log("🚀 ~ MockSigner ~ signMessage ~ message:", message)
         if (!this._account) {
             throw new Error("Account is not initialized.");
         }
@@ -53,7 +57,7 @@ export class MockSigner implements ISigner {
         const signature2 = this._account.signMessage({
             message: typeof message === "string" ? message : { raw: message },
         });
-        console.log("🚀 ~ MockSigner ~ signMessage ~ signature2:", signature2)
+
         console.log("🚀 ~ MockSigner ~ signMessage ~ signature:", signature)
         return signature;
     }

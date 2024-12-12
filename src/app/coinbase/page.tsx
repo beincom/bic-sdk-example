@@ -4,8 +4,15 @@ import { AuthSession } from "@/types";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { createSmartAccountController } from "@beincom/aa-coinbase";
-import { getCoinbaseSmartAccount } from "@/wallet";
-import { Address, getAddress, Hex, isAddress, zeroAddress } from "viem";
+import { getCoinbaseSmartAccount, getTestAccount } from "@/wallet";
+import {
+  Address,
+  erc20Abi,
+  getAddress,
+  Hex,
+  isAddress,
+  zeroAddress,
+} from "viem";
 import { owner0, owner1 } from "@/wallet/mock-signer";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
@@ -13,7 +20,6 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { BIC_ADDRESS, NFT_ADDRESS, USDT_ADDRESS } from "@/utils";
 import LoginForm from "@/components/LoginForm";
 import { NFTEntity, NFTType } from "@beincom/aa-sdk";
-
 
 enum SignerType {
   MPC = "mpc",
@@ -38,11 +44,13 @@ const CoinbasePage = () => {
   const { address: currentAddress } = useAccount();
 
   useEffect(() => {
-    if(!smartAccount) { return }
+    if (!smartAccount) {
+      return;
+    }
     const eventName = "transaction_receipt";
     smartAccount?.on(eventName, (data: any) => {
       console.log("Transaction receipt: ", data);
-      setTxId(data.data.transactionHash);
+      setTxId(data?.data?.transactionHash);
     });
     return () => {
       smartAccount.off(eventName, (data: any) => {
@@ -66,7 +74,6 @@ const CoinbasePage = () => {
     const coinbase = await smartAccount?.getAccount();
     setSmartAddress(coinbase.address);
     const owners = await smartAccount.getOwners();
-    console.log("🚀 ~ initData ~ owners:", owners);
     setOwners(owners);
   };
 
@@ -81,12 +88,9 @@ const CoinbasePage = () => {
 
     const newOwner = privateKeyToAccount(generatePrivateKey());
 
-    const data = await smartAccount.getKeepOnlyOwnersCalldata([
-      newOwner.address,
-      owner0.address,
-      currentAddress as Address,
-    ]);
-    console.log("🚀 ~ keepOwners ~ data:", data);
+    const data = await smartAccount.getKeepOnlyOwnersCallData({
+      owners: [newOwner.address, owner0.address, currentAddress as Address],
+    });
     if (signerType === SignerType.EXTERNAL) {
       const hash = await walletClient?.sendTransaction({
         to: smartAccount.getSmartAddress(),
@@ -121,7 +125,9 @@ const CoinbasePage = () => {
       return;
     }
 
-    const data = await smartAccount.getAddOwnersCalldata([newOwnerAddress]);
+    const data = await smartAccount.getAddOwnersCallData({
+      owners: [newOwnerAddress],
+    });
     if (signerType === SignerType.EXTERNAL) {
       const hash = await walletClient?.sendTransaction({
         to: smartAccount.getSmartAddress(),
@@ -154,10 +160,10 @@ const CoinbasePage = () => {
       return;
     }
 
-    const data = await smartAccount.getRemoveOwnerCalldata(
-      BigInt(index),
-      getAddress(owner)
-    );
+    const data = await smartAccount.getRemoveOwnerCallData({
+      index: index,
+      owner: getAddress(owner),
+    });
     console.log("🚀 ~ removeOwner ~ data:", data);
     if (signerType === SignerType.EXTERNAL) {
       const hash = await walletClient?.sendTransaction({
@@ -186,45 +192,65 @@ const CoinbasePage = () => {
   };
 
   const onTransferERC20 = async () => {
-    if(!smartAccount) { 
+    if (!smartAccount) {
       return;
     }
-    const data = await smartAccount?.getTransferERC20Calldata({
+    const testAccount = await getTestAccount();
+    // const transferOpHash = await testAccount.sendUserOperation({
+    //   paymasterAndData: BIC_ADDRESS,
+    //   calls: [
+    //     {
+    //       to: USDT_ADDRESS,
+    //       abi: erc20Abi,
+    //       functionName: "transfer",
+    //       args: [DEFAULT_TO_ADDRESS, BigInt(555)],
+    //     },
+    //   ],
+    // });
+    // await testAccount.waitForUserOperationReceipt({ hash: transferOpHash });
+    const data = await smartAccount?.getTransferERC20CallData({
       to: DEFAULT_TO_ADDRESS,
       amount: "0.05",
       token: {
         address: USDT_ADDRESS,
         decimals: 18,
-      }
+      },
     });
-    const receipt = await smartAccount?.executeTransactionWithCallData(data, isSimulate);
-    console.log("🚀 ~ onTransferERC20 ~ receipt:", receipt)
+    const receipt = await smartAccount?.executeTransactionWithCallData(
+      data,
+      isSimulate
+    );
+    console.log("🚀 ~ onTransferERC20 ~ receipt:", receipt);
   };
 
   const onTransferERC721 = async () => {
-    if(!smartAccount) { 
+    if (!smartAccount) {
       return;
     }
     const TOKEN_ID = "0";
-    const GIRL_COLLECTION_ADDRESS = "0xf2b7C765EE2976eF41B78aF2B6552d1C535B3cfA";
-    const data = await smartAccount?.getTransferERC721Calldata({
+    const GIRL_COLLECTION_ADDRESS =
+      "0xf2b7C765EE2976eF41B78aF2B6552d1C535B3cfA";
+    const data = await smartAccount?.getTransferERC721CallData({
       to: DEFAULT_TO_ADDRESS,
       tokenId: TOKEN_ID,
       token: {
         address: GIRL_COLLECTION_ADDRESS,
         // decimals: 0,
-      }
+      },
     });
-    const receipt = await smartAccount?.executeTransactionWithCallData(data, isSimulate);
-    console.log("🚀 ~ onTransferERC20 ~ receipt:", receipt)
+    const receipt = await smartAccount?.executeTransactionWithCallData(
+      data,
+      isSimulate
+    );
+    console.log("🚀 ~ onTransferERC20 ~ receipt:", receipt);
   };
 
   const onRequestHandle = async () => {
-    if(!smartAccount) { 
+    if (!smartAccount) {
       return;
     }
     const dateUnix = Math.floor(Date.now() / 1000);
-    const data = await smartAccount?.getRequestHandleCalldata(
+    const data = await smartAccount?.getRequestHandleCallData(
       {
         value: `test.${dateUnix}`,
         type: NFTType.ENFT,
@@ -232,13 +258,41 @@ const CoinbasePage = () => {
       },
       {
         headers: {
-          Authorization: session?.access_token
+          Authorization: session?.access_token,
         },
-      },
-    ); 
-    const receipt = await smartAccount?.executeTransactionWithCallData(data, isSimulate);
-    console.log("🚀 ~ onRequestHandle ~ receipt:", receipt)
-    
+      }
+    );
+    const receipt = await smartAccount?.executeTransactionWithCallData(
+      data,
+      isSimulate
+    );
+    console.log("🚀 ~ onRequestHandle ~ receipt:", receipt);
+  };
+
+  const onGetRedemption = async () => {
+    if (!smartAccount) {
+      return;
+    }
+    const data = await smartAccount.getRedemption({
+      redemptionAddress: "0xCD91d67E4B910e389b783C58025e8ae19C1172aE",
+    });
+    console.log("🚀 ~ onGetRedemption ~ data:", data);
+  };
+
+  const onRedeemVoucher = async () => {
+    if (!smartAccount) {
+      return;
+    }
+    const data = await smartAccount.getRedeemVoucherTokenCallData({
+      redemptionAddress: "0xCD91d67E4B910e389b783C58025e8ae19C1172aE",
+    });
+    console.log("🚀 ~ onRedeemVoucher ~ data:", data)
+
+    const receipt = await smartAccount.executeTransactionWithCallData(
+      data,
+      isSimulate
+    );
+    console.log("🚀 ~ onRedeemVoucher ~ receipt:", receipt)
   };
 
   return (
@@ -285,7 +339,7 @@ const CoinbasePage = () => {
               rel="noopener noreferrer"
               className="text-blue-500 underline"
             >
-             https://sepolia.arbiscan.io/tx/${txId}
+              https://sepolia.arbiscan.io/tx/${txId}
             </a>
           </div>
         )}
@@ -347,6 +401,21 @@ const CoinbasePage = () => {
           className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
         >
           Transfer ERC721
+        </button>
+      </div>
+      <div className="mb-5 bg-white border border-gray-300 shadow-md p-5 rounded">
+        <h2 className="text-2xl font-bold mb-3">Redemption Card</h2>
+        <button
+          onClick={onGetRedemption}
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
+        >
+          Get Redemption
+        </button>
+        <button
+          onClick={onRedeemVoucher}
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
+        >
+          Redeem Voucher
         </button>
       </div>
       <div className="bg-white border border-gray-300 shadow-md p-5 rounded">
