@@ -73,9 +73,9 @@ export async function getCoinbaseSmartAccount() {
                     endpoint: endPointUrl,
                     httpClient: auth.AxiosSingleton(),
                 }),
-                smartWalletAddress: null,
+                // smartWalletAddress: "0x0C1E13A5566Cb2F39bb354E4d6bd42521074dE7C",
                 passkeyCredential: "",
-                chain: arbitrumSepolia,
+                chain: arbitrumSepolia as any,
                 // paymasterAddress: BIC_ADDRESS,
                 // bicAddress: BIC_ADDRESS,
             })

@@ -59,7 +59,7 @@ const CoinbasePage = () => {
     const eventName = "transaction_receipt";
     smartAccount?.on(eventName, (data: any) => {
       console.log("Transaction receipt: ", data);
-      setTxId(data?.data?.transactionHash);
+      setTxId(data?.data?.transactionHash || data?.errorData?.receipt?.transactionHash);
     });
     return () => {
       smartAccount.off(eventName, (data: any) => {
@@ -81,7 +81,7 @@ const CoinbasePage = () => {
       return zeroAddress;
     }
     const coinbase = await smartAccount?.getAccount();
-    setSmartAddress(coinbase.address);
+    setSmartAddress(await smartAccount.getSmartAccountAddress());
     const owners = await smartAccount.getOwners();
     setOwners(owners);
   };
