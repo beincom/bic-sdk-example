@@ -22,7 +22,6 @@ export class MockSigner implements ISigner {
 
     constructor() { 
         this._account = owner0;
-        console.log("🚀 ~ MockSigner ~ constructor ~ this._account:", this._account.address)
     }
 
     public startSession(accessToken: string) {

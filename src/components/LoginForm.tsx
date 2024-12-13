@@ -8,8 +8,8 @@ import { useLocalStorage } from "usehooks-ts";
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("truongthi+1@evol.vn ");
   const [password, setPassword] = useState("Bein@123");
-  const [walletPassword, setWalletPassword] = useState("Bein@1234");
-  const [recoverKey, setRecoverKey] = useState("123456789");
+  const [walletPassword, setWalletPassword] = useState("Bein@123");
+  const [recoverKey, setRecoverKey] = useState("*dOC60P&05!?IJVxIb9bM1Xp2B@4&*c4");
   const [loginLoading, setLoginLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [session, setSession] = useLocalStorage<AuthSession | null>(

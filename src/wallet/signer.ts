@@ -68,7 +68,7 @@ export async function getCoinbaseSmartAccount() {
             {
                 debug: true,
                 // bundlerUrl: 'https://arb-sepolia.g.alchemy.com/v2/gA53VZ-kip4A01xx5mT2pKG3FbpKO1OW',
-                signer: mpcAccount,
+                signer: signer,
                 client: createBicSmartAccountClient({
                     endpoint: endPointUrl,
                     httpClient: auth.AxiosSingleton(),

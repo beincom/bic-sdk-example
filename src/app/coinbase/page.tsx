@@ -28,6 +28,7 @@ import { NFTEntity, NFTType } from "@beincom/aa-sdk";
 import { uniswapAdapter, uniswapHelper } from "@/utils/uniswap";
 import { PoolHelper } from "@beincom/dex";
 import { marketplace } from "@/utils/marketplace";
+import { paymentService } from "@/utils/payments";
 
 enum SignerType {
   MPC = "mpc",
@@ -446,7 +447,7 @@ const CoinbasePage = () => {
     }
 
     const data = await marketplace.collectAuctionPayout({
-      auctionId: "61",
+      auctionId: "65",
     });
     console.log("🚀 ~ onCollectPayout ~ data:", data)
 
@@ -458,6 +459,40 @@ const CoinbasePage = () => {
       isSimulate
     );
     console.log("🚀 ~ onCollectPayout ~ receipt:", receipt)
+  };
+
+  const onDonate = async () => {
+    if (!smartAccount) {
+      return;
+    }
+
+    const message = {
+      senderId: "9f5b0d5d-1fed-4d82-8e33-3e769d66dfac",
+      useCase: "content.donation",
+      objectId: "83b23114-31b6-4c50-b81f-98c56c5daa24",
+      message: "This is a message",
+    };
+    const data = await paymentService.transferERC20Message({
+      amount: "0.111",
+
+      token: {
+        address: BIC_ADDRESS,
+        decimals: 18,
+        name: "",
+        symbol: "",
+      },
+      to: "0xeaBcd21B75349c59a4177E10ed17FBf2955fE697",
+      msg: JSON.stringify(message),
+    });
+    console.log("🚀 ~ onDonate ~ data:", data)
+
+    const receipt = await smartAccount.executeTransactionWithCallData(
+      {
+        callData: data.calldata as `0x${string}`,
+      },
+      isSimulate
+    );
+    console.log("🚀 ~ onDonate ~ receipt:", receipt)
   };
 
   return (
@@ -596,6 +631,15 @@ const CoinbasePage = () => {
           className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
         >
           Swap BIC Out
+        </button>
+      </div>
+      <div className="mb-5 bg-white border border-gray-300 shadow-md p-5 rounded">
+        <h2 className="text-2xl font-bold mb-3">Donation Card</h2>
+        <button
+          onClick={onDonate}
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mr-4"
+        >
+          Donate
         </button>
       </div>
       <div className="mb-5 bg-white border border-gray-300 shadow-md p-5 rounded">
