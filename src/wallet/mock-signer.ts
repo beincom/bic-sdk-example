@@ -1,15 +1,7 @@
 import { Account, Hex, PrivateKeyAccount } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { ISigner } from "@beincom/chain-shared";
 
-interface ISigner {
-    login(authRequest: any): Promise<void>;
-    logout(): Promise<void>;
-    signMessage(message: string | Uint8Array): Promise<string>;
-    getAddress(): Promise<string>;
-    getWalletInfo<T = { userId: string; status: any; address: string }>(): Promise<T>;
-    isExistedDeviceShare(key: string, prefix?: string): Promise<boolean>;
-    getViemAccount(): any;
-}
 
 export const owner0 = privateKeyToAccount("0xaf34e9967006853180bea9cd0d557e9f46c253b0ddc37181c91b76cad718fd26");
 export const owner1 = privateKeyToAccount("0x2009eb9389a24a9b471094bca5126f865ef21da8dea42d306520ec674675fa67");
@@ -22,6 +14,14 @@ export class MockSigner implements ISigner {
 
     constructor() { 
         this._account = owner0;
+    }
+
+    get address() {
+        return this._account.address;
+    };
+
+    public async getSystemOwnerAddress(): Promise<string> {
+        return this._account.address;
     }
 
     public startSession(accessToken: string) {
@@ -52,12 +52,7 @@ export class MockSigner implements ISigner {
         if (!this._account.signMessage) {
             throw new Error("signMessage method is not defined.");
         }
-        const signature = this._account.signMessage({ message: message as string });
-        const signature2 = this._account.signMessage({
-            message: typeof message === "string" ? message : { raw: message },
-        });
-
-        console.log("🚀 ~ MockSigner ~ signMessage ~ signature:", signature)
+        const signature = await this._account.sign({ hash: message as Hex });
         return signature;
     }
 

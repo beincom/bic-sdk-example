@@ -34,6 +34,7 @@ export const signer = createBicSigner({
         return session.id_token
     },
 })
+
 let smartAccount: BicSmartAccount;
 export async function getSmartAccount() {
     if (smartAccount) return smartAccount
@@ -58,7 +59,7 @@ let coinbaseSmartAccount: Awaited<ReturnType<typeof createSmartAccountController
 export async function getCoinbaseSmartAccount() {
     try {
         if (coinbaseSmartAccount) return coinbaseSmartAccount
-        const mpcAccount = new MockSigner();
+        const mockSigner = new MockSigner();
         const token = await auth.getToken();
         if (!token) {
             throw new Error('token not found')
@@ -68,7 +69,7 @@ export async function getCoinbaseSmartAccount() {
             {
                 debug: true,
                 // bundlerUrl: 'https://arb-sepolia.g.alchemy.com/v2/gA53VZ-kip4A01xx5mT2pKG3FbpKO1OW',
-                signer: signer,
+                signer: mockSigner,
                 client: createBicSmartAccountClient({
                     endpoint: endPointUrl,
                     httpClient: auth.AxiosSingleton(),
